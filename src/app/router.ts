@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { routeTree } from './route-tree.gen'
+import { parseSearch, stringifySearch } from './search-params'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -10,6 +11,8 @@ export function createAppRouter(queryClient: QueryClient) {
   return createRouter({
     routeTree,
     context: { queryClient },
+    parseSearch,
+    stringifySearch,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
     scrollRestoration: true,

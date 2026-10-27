@@ -1,3 +1,3 @@
-import type { RequestHandler, WebSocketHandler } from 'msw'
+import { catalogHandlers } from './http/catalog-handlers'
 
-export const handlers: Array<RequestHandler | WebSocketHandler> = []
+export const handlers = [...catalogHandlers]

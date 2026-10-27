@@ -5,10 +5,6 @@ export async function bootstrapMocks() {
     return
   }
 
-  const { worker } = await import('@/mocks/browser')
-
-  await worker.start({
-    onUnhandledRequest: 'bypass',
-    quiet: true,
-  })
+  const { startMockEnvironment } = await import('@/mocks/browser')
+  await startMockEnvironment()
 }

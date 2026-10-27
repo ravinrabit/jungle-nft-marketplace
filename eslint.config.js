@@ -63,6 +63,7 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'local/no-comments': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       eqeqeq: ['error', 'always'],
@@ -70,7 +71,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/app/routes/**/*.tsx'],
+    files: ['src/app/routes/**/*.tsx', 'src/shared/ui/**/*.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },
