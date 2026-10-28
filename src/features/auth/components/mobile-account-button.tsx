@@ -1,4 +1,5 @@
-import { LogOut, User as UserIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { LogOut, User as UserIcon, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/shared/lib/cn'
 import {
@@ -58,7 +59,27 @@ export function MobileAccountButton({ className }: MobileAccountButtonProps) {
           <SheetTitle>{user.displayName}</SheetTitle>
           <SheetDescription className="text-text-secondary">{user.email}</SheetDescription>
         </SheetHeader>
-        <div className="px-4">
+        <div className="flex flex-col gap-3 px-4">
+          <Link
+            to="/perfil"
+            className="flex h-12 items-center gap-3 rounded-[0.625rem] bg-surface-raised px-4 text-base text-foreground"
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <UserIcon aria-hidden="true" className="size-4 text-price-muted" />
+            Meu perfil
+          </Link>
+          <Link
+            to="/perfil/carteiras"
+            className="flex h-12 items-center gap-3 rounded-[0.625rem] bg-surface-raised px-4 text-base text-foreground"
+            onClick={() => {
+              setIsOpen(false)
+            }}
+          >
+            <Wallet aria-hidden="true" className="size-4 text-price-muted" />
+            Carteiras
+          </Link>
           <button
             type="button"
             disabled={isSigningOut}

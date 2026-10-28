@@ -27,7 +27,7 @@ function RootLayout() {
       </a>
       <div className="mx-auto flex min-h-dvh w-full max-w-[75rem] flex-col px-6 pt-10 pb-36 lg:px-6 lg:pt-6 lg:pb-6 xl:px-0">
         <div className="hidden lg:block">
-          <SiteHeader showDivider={pathname === '/'} />
+          <SiteHeader showDivider={pathname === '/' || pathname.startsWith('/perfil')} />
         </div>
         <main id="conteudo" tabIndex={-1} className="flex-1 outline-none lg:pt-8">
           <Outlet />

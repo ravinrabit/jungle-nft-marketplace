@@ -1,4 +1,5 @@
-import { ChevronDown, LogOut } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { ChevronDown, LogOut, User as UserIcon, Wallet } from 'lucide-react'
 import type { User } from '@/shared/api/contracts/account'
 import {
   DropdownMenu,
@@ -29,6 +30,25 @@ export function UserMenu({ user }: { user: User }) {
           <span className="truncate text-sm font-bold text-foreground">{user.displayName}</span>
           <span className="truncate text-xs font-normal text-text-secondary">{user.email}</span>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-border" />
+        <DropdownMenuItem
+          asChild
+          className="cursor-pointer text-foreground focus:bg-surface-raised focus:text-text-accent"
+        >
+          <Link to="/perfil">
+            <UserIcon aria-hidden="true" className="size-4" />
+            Meu perfil
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          asChild
+          className="cursor-pointer text-foreground focus:bg-surface-raised focus:text-text-accent"
+        >
+          <Link to="/perfil/carteiras">
+            <Wallet aria-hidden="true" className="size-4" />
+            Carteiras
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
           disabled={isSigningOut}

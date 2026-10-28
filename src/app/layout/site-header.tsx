@@ -8,11 +8,16 @@ import { UserMenu } from '@/features/auth/components/user-menu'
 import { useAuthNavigation } from '@/features/auth/use-auth-navigation'
 import { SearchDialog } from './search-dialog'
 
-type NavSection = 'home' | 'market'
+type NavSection = 'home' | 'market' | 'none'
+
+const MARKET_PATH_PREFIXES = ['/nfts', '/carrinho', '/pagamento', '/pedidos'] as const
 
 function useActiveSection(): NavSection {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
-  return pathname === '/' ? 'home' : 'market'
+  if (pathname === '/') {
+    return 'home'
+  }
+  return MARKET_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix)) ? 'market' : 'none'
 }
 
 const NAV_TEXT = 'text-base leading-none'

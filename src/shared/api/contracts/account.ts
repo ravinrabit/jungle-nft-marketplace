@@ -1,11 +1,13 @@
 import { z } from 'zod'
-import { networkIdSchema } from './catalog'
+import { NETWORK_IDS, networkIdSchema, type NetworkId } from './catalog'
 import { entityIdSchema, isoDateTimeSchema, versionSchema } from './common'
 
 export const WALLET_PROVIDERS = ['metamask', 'walletconnect', 'coinbase'] as const
 export const WALLET_SLOTS = ['primary', 'secondary'] as const
 
 export const PASSWORD_MIN_LENGTH = 8
+export const MAX_AVATAR_BYTES = 512 * 1024
+const MAX_AVATAR_DATA_URL_LENGTH = Math.ceil((MAX_AVATAR_BYTES * 4) / 3) + 64
 
 const emailSchema = z.email('Informe um e-mail válido').trim().toLowerCase()
 
@@ -77,6 +79,7 @@ export const profileUpdateRequestSchema = z.object({
 export const avatarUpdateRequestSchema = z.object({
   dataUrl: z
     .string()
+    .max(MAX_AVATAR_DATA_URL_LENGTH, 'A imagem deve ter no máximo 512 KB')
     .regex(
       /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,
       'Envie uma imagem PNG, JPG ou WebP',
@@ -115,21 +118,59 @@ export const walletSchema = z.object({
   updatedAt: isoDateTimeSchema,
 })
 
-export const walletUpsertRequestSchema = z.object({
-  label: z.string().trim().min(2, 'Informe pelo menos 2 caracteres').max(40),
-  nickname: z.string().trim().min(2, 'Informe pelo menos 2 caracteres').max(30),
-  network: networkIdSchema,
-  profileName: z.string().trim().min(2, 'Informe pelo menos 2 caracteres').max(40),
-  address: z.string().trim().min(1, 'Informe o endereço da carteira'),
-  alternateAddress: z.string().trim().max(64).nullable(),
-  provider: walletProviderSchema,
-  referralCode: z
-    .string()
-    .trim()
-    .regex(/^[A-Z0-9]{4,12}$/, 'Use de 4 a 12 letras maiúsculas ou números'),
-  email: emailSchema,
-  ensName: ensNameSchema,
-})
+const EVM_ADDRESS = /^0x[a-fA-F0-9]{40}$/
+const SOLANA_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/
+const ENS_DOMAIN = /^[a-z0-9-]{3,32}(\.[a-z0-9-]{1,32})*\.eth$/
+
+export function isValidWalletAddress(network: NetworkId, address: string) {
+  return network === 'solana' ? SOLANA_ADDRESS.test(address) : EVM_ADDRESS.test(address)
+}
+
+export const walletUpsertRequestSchema = z
+  .object({
+    label: z.string().trim().min(2, 'Informe pelo menos 2 caracteres').max(40),
+    nickname: z.string().trim().min(2, 'Informe pelo menos 2 caracteres').max(30),
+    network: z.string().pipe(z.enum(NETWORK_IDS, { error: 'Selecione uma rede' })),
+    profileName: z.string().trim().min(2, 'Informe pelo menos 2 caracteres').max(40),
+    address: z.string().trim().min(1, 'Informe o endereço da carteira'),
+    alternateAddress: z
+      .string()
+      .trim()
+      .max(64, 'Use no máximo 64 caracteres')
+      .transform((value) => value || null)
+      .nullable(),
+    provider: z.string().pipe(z.enum(WALLET_PROVIDERS, { error: 'Selecione uma carteira' })),
+    referralCode: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-Z0-9]{4,12}$/, 'Use de 4 a 12 letras ou números'),
+    email: emailSchema,
+    ensName: ensNameSchema,
+  })
+  .superRefine(({ network, address, alternateAddress }, context) => {
+    if (address && !isValidWalletAddress(network, address)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['address'],
+        message:
+          network === 'solana'
+            ? 'Informe um endereço Solana válido'
+            : 'Informe um endereço 0x com 40 caracteres hexadecimais',
+      })
+    }
+    if (
+      alternateAddress &&
+      !ENS_DOMAIN.test(alternateAddress) &&
+      !isValidWalletAddress(network, alternateAddress)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['alternateAddress'],
+        message: 'Informe um nome ENS terminado em .eth ou um endereço válido',
+      })
+    }
+  })
 
 export const walletListResponseSchema = z.object({ items: z.array(walletSchema) })
 
@@ -144,4 +185,5 @@ export type ProfileUpdateRequest = z.infer<typeof profileUpdateRequestSchema>
 export type AvatarUpdateRequest = z.infer<typeof avatarUpdateRequestSchema>
 export type PasswordChangeRequest = z.infer<typeof passwordChangeRequestSchema>
 export type Wallet = z.infer<typeof walletSchema>
-export type WalletUpsertRequest = z.infer<typeof walletUpsertRequestSchema>
+export type WalletUpsertRequest = z.output<typeof walletUpsertRequestSchema>
+export type WalletFormValues = z.input<typeof walletUpsertRequestSchema>
