@@ -40,6 +40,7 @@ interface WalletFormProps {
   userId: string
   slot: WalletSlot
   defaultValues: WalletFormValues
+  onSaved?: (() => void) | undefined
 }
 
 const SLOT_LABELS: Record<WalletSlot, string> = {
@@ -47,7 +48,7 @@ const SLOT_LABELS: Record<WalletSlot, string> = {
   secondary: 'Carteira secundária',
 }
 
-export function WalletForm({ userId, slot, defaultValues }: WalletFormProps) {
+export function WalletForm({ userId, slot, defaultValues, onSaved }: WalletFormProps) {
   const saveWallet = useSaveWallet(userId, slot)
   const form = useForm<WalletFormValues, unknown, WalletUpsertRequest>({
     resolver: zodResolver(walletUpsertRequestSchema),
@@ -60,6 +61,7 @@ export function WalletForm({ userId, slot, defaultValues }: WalletFormProps) {
       const saved = await saveWallet.mutateAsync(values)
       form.reset(toWalletFormValues(saved))
       toast.success(`${SLOT_LABELS[slot]} salva.`)
+      onSaved?.()
     } catch (error) {
       if (!applyServerFieldErrors(error, WALLET_FIELDS, form.setError)) {
         toast.error(getErrorMessage(error))

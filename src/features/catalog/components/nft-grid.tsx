@@ -16,6 +16,7 @@ interface NftGridProps {
 export function NftGrid({ items, isRefreshing }: NftGridProps) {
   return (
     <ul
+      aria-label="Resultados do catálogo"
       className={cn(GRID_CLASSES, 'transition-opacity', isRefreshing && 'opacity-60')}
       aria-busy={isRefreshing}
     >

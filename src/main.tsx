@@ -13,6 +13,8 @@ import { createAppRouter } from '@/app/router'
 import { StartupErrorScreen } from '@/app/startup-error-screen'
 import { expireSession } from '@/features/auth/session-expiration'
 import { registerGuestCartMerge } from '@/features/cart/merge-guest-cart-on-login'
+import { registerCheckoutCleanup } from '@/features/checkout/checkout-storage'
+import { startRealtimeSync } from '@/features/realtime/start-realtime-sync'
 import { sessionToken } from '@/features/auth/session-token'
 import { bindAuthentication } from '@/shared/api/http-client'
 
@@ -29,12 +31,22 @@ function renderApp(root: ReturnType<typeof createRoot>) {
   const router = createAppRouter(queryClient)
 
   registerGuestCartMerge()
+  registerCheckoutCleanup()
 
   bindAuthentication({
     getToken: () => sessionToken.read(),
     onSessionRejected: () => {
       expireSession(queryClient, router)
     },
+  })
+
+  startRealtimeSync({
+    queryClient,
+    openOrder: (orderId) => {
+      void router.navigate({ to: '/pedidos/$orderId', params: { orderId } })
+    },
+  }).catch((error: unknown) => {
+    console.error('Falha ao iniciar as atualizações em tempo real', error)
   })
 
   root.render(

@@ -57,6 +57,13 @@ export function readBearerToken(request: Request) {
   return header?.startsWith(BEARER_PREFIX) ? header.slice(BEARER_PREFIX.length).trim() : null
 }
 
+export function findActiveSessionUserId(token: string) {
+  return database.read((state) => {
+    const session = state.sessions.find((candidate) => candidate.token === token)
+    return session && Date.parse(session.expiresAt) > Date.now() ? session.userId : null
+  })
+}
+
 export interface AuthenticatedContext {
   token: string
   session: SessionRecord

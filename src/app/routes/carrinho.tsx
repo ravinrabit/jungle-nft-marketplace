@@ -1,18 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { couponSearchSchema } from '@/features/cart/coupon-search'
 import { CartPage } from '@/features/cart/components/cart-page'
 
-const cartSearchSchema = z.object({
-  cupom: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .regex(/^[A-Z0-9]{3,32}$/)
-    .optional()
-    .catch(undefined),
-})
-
 export const Route = createFileRoute('/carrinho')({
-  validateSearch: cartSearchSchema,
+  validateSearch: couponSearchSchema,
   component: CartPage,
 })

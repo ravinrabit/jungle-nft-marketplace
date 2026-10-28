@@ -8,6 +8,10 @@ export const SOCKET_EVENTS = {
   orderUpdated: 'order.updated',
 } as const
 
+export const SOCKET_CLIENT_EVENTS = {
+  identify: 'session.identify',
+} as const
+
 const eventEnvelope = {
   eventId: entityIdSchema,
   version: versionSchema,
@@ -39,7 +43,7 @@ export const orderUpdatedEventSchema = z.object({
   data: z.object({
     status: orderStatusSchema,
     transactionHash: z.string().nullable(),
-    explorerUrl: z.string().nullable(),
+    explorerUrl: z.url({ protocol: /^https$/ }).nullable(),
     declineReason: z.string().nullable(),
   }),
 })

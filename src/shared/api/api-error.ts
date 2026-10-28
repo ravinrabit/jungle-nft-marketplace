@@ -27,6 +27,8 @@ const FALLBACK_MESSAGES: Record<ClientErrorCode, string> = {
   COUPON_EXPIRED: 'O cupom informado expirou.',
   IDEMPOTENCY_CONFLICT: 'Esta tentativa de compra já foi usada com outros dados.',
   PAYMENT_DECLINED: 'O pagamento foi recusado pela carteira.',
+  WALLET_REJECTED: 'A conexão foi recusada na carteira.',
+  WALLET_DISCONNECTED: 'A carteira foi desconectada. Conecte novamente para continuar.',
   TRANSIENT_FAILURE: 'O serviço está instável no momento. Tente novamente em instantes.',
   INTERNAL_ERROR: 'Ocorreu um erro inesperado no servidor.',
   NETWORK_ERROR: 'Sem conexão com o servidor. Verifique sua internet e tente novamente.',

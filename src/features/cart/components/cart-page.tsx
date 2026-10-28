@@ -1,11 +1,10 @@
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getRouteApi, Link, useRouter } from '@tanstack/react-router'
-import { ArrowLeft } from 'lucide-react'
+import { getRouteApi, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { Quote } from '@/shared/api/contracts/commerce'
 import { getErrorMessage, hasErrorCode, isApiError } from '@/shared/api/api-error'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
 import { Button } from '@/shared/ui/button'
+import { MarketBreadcrumb, MobilePageHeader } from '@/shared/ui/page-heading'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { CatalogMessage } from '@/features/catalog/components/nft-grid'
 import { RelatedNfts } from '@/features/nft-detail/components/related-nfts'
@@ -33,7 +32,7 @@ function CartSkeleton() {
       aria-label="Carregando carrinho"
       className="flex flex-col gap-5 lg:flex-row lg:justify-between"
     >
-      <div className="flex flex-col gap-3 lg:w-[48.875rem]">
+      <div className="flex min-w-0 flex-1 flex-col gap-3 xl:w-[48.875rem] xl:flex-none">
         {Array.from({ length: 3 }, (_, index) => (
           <Skeleton
             key={index}
@@ -41,7 +40,7 @@ function CartSkeleton() {
           />
         ))}
       </div>
-      <div className="flex flex-col gap-4 lg:w-[20.75rem]">
+      <div className="flex flex-col gap-4 lg:w-[17.5rem] xl:w-[20.75rem]">
         <Skeleton className="h-10 w-full" />
         {Array.from({ length: 4 }, (_, index) => (
           <Skeleton key={index} className="h-5 w-full" />
@@ -55,7 +54,6 @@ function CartSkeleton() {
 export function CartPage() {
   const { cupom } = routeApi.useSearch()
   const navigate = routeApi.useNavigate()
-  const router = useRouter()
   const queryClient = useQueryClient()
   const { owner, query: cartQuery } = useCart()
   const cart = cartQuery.data
@@ -108,7 +106,7 @@ export function CartPage() {
     isBlocked: blockReason !== null || quoteQuery.isFetching,
     blockReason,
     onCheckout: () => {
-      notifyUnavailableFeature('O pagamento')
+      void navigate({ to: '/pagamento', search: { cupom: effectiveCoupon ?? undefined } })
     },
   }
 
@@ -131,39 +129,8 @@ export function CartPage() {
   return (
     <div className="flex flex-col gap-12 lg:gap-24">
       <div className="flex flex-col gap-3">
-        <nav aria-label="Trilha de navegação" className="hidden lg:block">
-          <ol className="flex gap-1 text-[0.9375rem] leading-4 font-bold text-foreground">
-            <li>
-              <Link to="/" className="hover:text-text-accent">
-                Início
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li>
-              <Link to="/" hash="catalogo" className="hover:text-text-accent">
-                Mercado
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page">Carrinho</li>
-          </ol>
-        </nav>
-
-        <header className="relative flex h-11 items-center justify-center lg:h-auto lg:justify-start">
-          <button
-            type="button"
-            aria-label="Voltar"
-            className="absolute left-0 flex size-[2.1875rem] cursor-pointer items-center justify-center rounded-full border border-border bg-surface-raised text-text-secondary lg:hidden"
-            onClick={() => {
-              router.history.back()
-            }}
-          >
-            <ArrowLeft aria-hidden="true" className="size-5" />
-          </button>
-          <h1 className="text-xl leading-4 font-bold text-foreground lg:sr-only">
-            Carrinho de NFTs
-          </h1>
-        </header>
+        <MarketBreadcrumb current="Carrinho" />
+        <MobilePageHeader title="Carrinho de NFTs" />
 
         {priceChanges.length > 0 && (
           <p
@@ -199,12 +166,12 @@ export function CartPage() {
           />
         ) : (
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="hidden w-[48.875rem] flex-col gap-3 lg:flex">
+            <div className="hidden min-w-0 flex-1 flex-col gap-3 lg:flex xl:w-[48.875rem] xl:flex-none">
               <div
                 className="flex justify-between pr-6 text-base leading-4 text-foreground"
                 aria-hidden="true"
               >
-                <span className="w-[15.625rem] font-bold">NFTs</span>
+                <span className="w-[12.5rem] font-bold xl:w-[15.625rem]">NFTs</span>
                 <span className="w-[4.8125rem] font-medium">Preço</span>
                 <span className="w-[4.6875rem] font-bold">Edições</span>
                 <span className="w-[5.4375rem] font-medium">Total</span>

@@ -7,6 +7,7 @@ import { Toaster } from '@/shared/ui/sonner'
 import { authSearchSchema } from '@/features/auth/auth-search'
 import { AuthDialog } from '@/features/auth/components/auth-dialog'
 import { SessionWatcher } from '@/features/auth/components/session-watcher'
+import { RealtimeStatusNotice } from '@/features/realtime/components/realtime-status-notice'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   validateSearch: authSearchSchema,
@@ -39,6 +40,7 @@ function RootLayout() {
       <MobileTabBar />
       <AuthDialog />
       <SessionWatcher />
+      <RealtimeStatusNotice />
       <Toaster position="top-center" />
     </>
   )

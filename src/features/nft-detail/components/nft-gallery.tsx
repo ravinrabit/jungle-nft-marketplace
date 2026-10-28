@@ -26,7 +26,10 @@ export function NftGallery({ nft }: NftGalleryProps) {
 
   return (
     <div className="flex gap-7">
-      <ul aria-label="Miniaturas" className="flex w-[6.25rem] shrink-0 flex-col gap-4">
+      <ul
+        aria-label="Miniaturas"
+        className="hidden w-[6.25rem] shrink-0 flex-col gap-4 min-[64rem]:flex"
+      >
         {nft.gallery.map((artwork, index) => {
           const isActive = index === activeIndex
           return (
@@ -55,13 +58,13 @@ export function NftGallery({ nft }: NftGalleryProps) {
         })}
       </ul>
 
-      <div className="relative flex size-[27.75rem] shrink-0 items-center justify-center rounded-md bg-surface-card">
+      <div className="relative flex size-[22rem] shrink-0 items-center justify-center rounded-md bg-surface-card min-[64rem]:size-[27.75rem]">
         <NftArtwork
           artwork={activeArtwork}
           alt={`${nft.imageAlt}. ${imageLabel(activeIndex, total)}`}
           sizes="404px"
           priority
-          className="size-[25.25rem] rounded-3xl"
+          className="size-[20rem] rounded-3xl min-[64rem]:size-[25.25rem]"
         />
         <Dialog>
           <DialogTrigger asChild>

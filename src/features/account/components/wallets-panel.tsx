@@ -64,11 +64,12 @@ function SameAsPrimaryToggle({
 
 interface SecondaryWalletProps {
   userId: string
+  onWalletSaved: (() => void) | undefined
   primary: Wallet | undefined
   secondary: Wallet | undefined
 }
 
-function SecondaryWallet({ userId, primary, secondary }: SecondaryWalletProps) {
+function SecondaryWallet({ userId, onWalletSaved, primary, secondary }: SecondaryWalletProps) {
   const [draft, setDraft] = useState<{ values: WalletFormValues; version: number } | null>(null)
   const [isSameAsPrimary, setIsSameAsPrimary] = useState(false)
   const formValues = draft?.values ?? (secondary ? toWalletFormValues(secondary) : null)
@@ -114,6 +115,7 @@ function SecondaryWallet({ userId, primary, secondary }: SecondaryWalletProps) {
             userId={userId}
             slot="secondary"
             defaultValues={formValues}
+            onSaved={onWalletSaved}
           />
         </div>
       ) : (
@@ -125,7 +127,12 @@ function SecondaryWallet({ userId, primary, secondary }: SecondaryWalletProps) {
   )
 }
 
-export function WalletsPanel({ userId }: { userId: string }) {
+interface WalletsPanelProps {
+  userId: string
+  onWalletSaved?: (() => void) | undefined
+}
+
+export function WalletsPanel({ userId, onWalletSaved }: WalletsPanelProps) {
   const query = useQuery(walletsQueryOptions(userId))
   const [isAddingPrimary, setIsAddingPrimary] = useState(false)
 
@@ -178,6 +185,7 @@ export function WalletsPanel({ userId }: { userId: string }) {
             userId={userId}
             slot="primary"
             defaultValues={primary ? toWalletFormValues(primary) : EMPTY_WALLET_VALUES}
+            onSaved={onWalletSaved}
           />
         ) : (
           <p className="text-sm text-text-secondary">
@@ -185,7 +193,12 @@ export function WalletsPanel({ userId }: { userId: string }) {
           </p>
         )}
       </section>
-      <SecondaryWallet userId={userId} primary={primary} secondary={secondary} />
+      <SecondaryWallet
+        userId={userId}
+        onWalletSaved={onWalletSaved}
+        primary={primary}
+        secondary={secondary}
+      />
     </div>
   )
 }

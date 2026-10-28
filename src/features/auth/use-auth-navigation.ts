@@ -2,12 +2,32 @@ import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useCallback } from 'react'
 import type { AuthMode } from './auth-search'
 
+let focusReturnTarget: HTMLElement | null = null
+
+function rememberOpener() {
+  const active = document.activeElement
+  if (active instanceof HTMLElement && !active.closest('[role="dialog"]')) {
+    focusReturnTarget = active
+  }
+}
+
+function restoreOpenerFocus() {
+  const target = focusReturnTarget
+  focusReturnTarget = null
+  requestAnimationFrame(() => {
+    if (target?.isConnected) {
+      target.focus()
+    }
+  })
+}
+
 export function useAuthNavigation() {
   const navigate = useNavigate()
   const router = useRouter()
 
   const openAuth = useCallback(
     (mode: AuthMode, redirect?: string) => {
+      rememberOpener()
       void navigate({
         to: '.',
         search: (previous) => ({
@@ -27,7 +47,7 @@ export function useAuthNavigation() {
       search: (previous) => ({ ...previous, auth: undefined, redirect: undefined }),
       replace: true,
       resetScroll: false,
-    })
+    }).then(restoreOpenerFocus)
   }, [navigate])
 
   const completeAuth = useCallback(

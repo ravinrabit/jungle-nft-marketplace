@@ -37,10 +37,26 @@ export async function startSession(queryClient: QueryClient, response: AuthRespo
   )
 }
 
-export function endSession(queryClient: QueryClient) {
+export type SessionEndReason = 'signed-out' | 'expired'
+
+type SessionEndListener = (reason: SessionEndReason) => void
+
+const sessionEndListeners = new Set<SessionEndListener>()
+
+export function onSessionEnded(listener: SessionEndListener) {
+  sessionEndListeners.add(listener)
+  return () => {
+    sessionEndListeners.delete(listener)
+  }
+}
+
+export function endSession(queryClient: QueryClient, reason: SessionEndReason) {
   sessionToken.clear()
   discardPrivateData(queryClient)
   queryClient.setQueryData<Session | null>(authKeys.session, null)
+  for (const listener of sessionEndListeners) {
+    listener(reason)
+  }
 }
 
 export function isSessionActive(session: Session | null | undefined): session is Session {

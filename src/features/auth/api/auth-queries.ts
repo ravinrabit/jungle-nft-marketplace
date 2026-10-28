@@ -54,7 +54,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logout,
     onSettled: () => {
-      endSession(queryClient)
+      endSession(queryClient, 'signed-out')
     },
   })
 }

@@ -15,7 +15,9 @@ export function registerGuestCartMerge() {
     try {
       const cart = await mergeGuestCart(guestId)
       guestCartId.clear()
-      queryClient.setQueryData(cartKeys.cart(privateQueryKey(session.user.id)), cart)
+      const userCartKey = cartKeys.cart(privateQueryKey(session.user.id))
+      await queryClient.cancelQueries({ queryKey: userCartKey })
+      queryClient.setQueryData(userCartKey, cart)
       queryClient.removeQueries({ queryKey: [GUEST_CART_ROOT] })
 
       for (const adjustment of cart.adjustments) {

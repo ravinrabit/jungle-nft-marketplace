@@ -16,7 +16,7 @@ export function expireSession(queryClient: QueryClient, router: AnyRouter) {
     return
   }
 
-  endSession(queryClient)
+  endSession(queryClient, 'expired')
   toast.warning('Sua sessão expirou. Entre novamente para continuar de onde parou.', {
     id: EXPIRED_TOAST_ID,
   })

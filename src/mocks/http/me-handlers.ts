@@ -12,16 +12,8 @@ import { database } from '@/mocks/db/database'
 import type { UserRecord, WalletRecord } from '@/mocks/db/records'
 import { authenticate, toUser } from '@/mocks/domain/sessions'
 import { hashPassword, verifyPassword } from '@/mocks/lib/password-hash'
-import { mockApi, readPathParam } from './mock-api'
+import { mockApi, readJson, readPathParam } from './mock-api'
 import { apiError, notFound, validationError } from './responses'
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return await request.json()
-  } catch {
-    return null
-  }
-}
 
 function toWallet(record: WalletRecord): Wallet {
   const { userId, ...wallet } = record

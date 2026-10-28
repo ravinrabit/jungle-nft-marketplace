@@ -120,20 +120,39 @@ export const collectorDetailsSchema = z.object({
   referralCode: z
     .string()
     .trim()
-    .regex(/^[A-Z0-9]{4,12}$/, 'Use de 4 a 12 letras maiúsculas ou números'),
+    .toUpperCase()
+    .regex(/^[A-Z0-9]{4,12}$/, 'Use de 4 a 12 letras ou números'),
   email: z.email('Informe um e-mail válido').trim().toLowerCase(),
   ensName: z
     .string()
     .trim()
     .regex(/^[a-z0-9-]{3,32}$/, 'Use de 3 a 32 letras minúsculas, números ou hífen'),
-  note: z.string().trim().max(280, 'Use no máximo 280 caracteres').nullable(),
+  note: z
+    .string()
+    .trim()
+    .max(280, 'Use no máximo 280 caracteres')
+    .transform((value) => value || null)
+    .nullable(),
+})
+
+export const walletConnectionRequestSchema = z.object({
+  walletId: entityIdSchema,
+  provider: walletProviderSchema,
+  network: networkIdSchema,
+})
+
+export const walletConnectionSchema = z.object({
+  id: entityIdSchema,
+  walletId: entityIdSchema,
+  provider: walletProviderSchema,
+  network: networkIdSchema,
+  address: z.string(),
+  connectedAt: isoDateTimeSchema,
 })
 
 export const createOrderRequestSchema = z.object({
   quoteId: entityIdSchema,
-  walletId: entityIdSchema,
-  provider: walletProviderSchema,
-  network: networkIdSchema,
+  connectionId: entityIdSchema,
   collector: collectorDetailsSchema,
 })
 
@@ -157,11 +176,15 @@ export const orderSchema = z.object({
   coupon: couponSchema.nullable(),
   wallet: orderWalletSchema,
   transactionHash: z.string().nullable(),
-  explorerUrl: z.string().nullable(),
+  explorerUrl: z.url({ protocol: /^https$/ }).nullable(),
   declineReason: z.string().nullable(),
   version: versionSchema,
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
+})
+
+export const activeOrderResponseSchema = z.object({
+  order: orderSchema.nullable(),
 })
 
 export const IDEMPOTENCY_KEY_HEADER = 'Idempotency-Key'
@@ -180,7 +203,10 @@ export type QuoteLine = z.infer<typeof quoteLineSchema>
 export type QuoteIssue = z.infer<typeof quoteIssueSchema>
 export type Coupon = z.infer<typeof couponSchema>
 export type Quote = z.infer<typeof quoteSchema>
-export type CollectorDetails = z.infer<typeof collectorDetailsSchema>
+export type CollectorDetails = z.output<typeof collectorDetailsSchema>
+export type CollectorDetailsInput = z.input<typeof collectorDetailsSchema>
+export type WalletConnectionRequest = z.infer<typeof walletConnectionRequestSchema>
+export type WalletConnection = z.infer<typeof walletConnectionSchema>
 export type CreateOrderRequest = z.infer<typeof createOrderRequestSchema>
 export type OrderWallet = z.infer<typeof orderWalletSchema>
 export type Order = z.infer<typeof orderSchema>

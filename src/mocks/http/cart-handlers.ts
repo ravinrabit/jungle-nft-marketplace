@@ -14,26 +14,17 @@ import {
   findCart,
   findOrCreateCart,
   mergeCarts,
-  ownerKey,
   resolveCoupon,
   resolveEdition,
+  storeQuote,
   toCartPayload,
   touchCart,
 } from '@/mocks/domain/cart'
 import { authenticate, readBearerToken } from '@/mocks/domain/sessions'
-import { mockApi, readPathParam } from './mock-api'
+import { mockApi, readJson, readPathParam } from './mock-api'
 import { apiError, notFound, validationError } from './responses'
 
 const guestIdSchema = z.uuid()
-const MAX_STORED_QUOTES_PER_OWNER = 5
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return await request.json()
-  } catch {
-    return null
-  }
-}
 
 function resolveOwner(request: Request): CartOwner | null | Response {
   if (readBearerToken(request)) {
@@ -215,11 +206,7 @@ export const cartHandlers = [
         coupon.status === 'valid' ? coupon.coupon : null,
         body.data.network,
       )
-      const key = ownerKey(owner)
-      const previous = state.quotes.filter((stored) => stored.ownerKey === key)
-      const keep = new Set(previous.slice(-MAX_STORED_QUOTES_PER_OWNER + 1).map((q) => q.id))
-      state.quotes = state.quotes.filter((stored) => stored.ownerKey !== key || keep.has(stored.id))
-      state.quotes.push({ ...quote, ownerKey: key })
+      storeQuote(state, owner, quote)
       return HttpResponse.json(quote)
     })
   }),

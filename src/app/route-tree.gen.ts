@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as PagamentoRouteImport } from './routes/pagamento'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NftsNftIdRouteImport } from './routes/nfts.$nftId'
+import { Route as PedidosOrderIdRouteImport } from './routes/pedidos.$orderId'
 import { Route as PerfilIndexRouteImport } from './routes/perfil.index'
 import { Route as PerfilCarteirasRouteImport } from './routes/perfil.carteiras'
 
@@ -26,6 +28,11 @@ const CarrinhoRoute = CarrinhoRouteImport.update({
   path: '/carrinho',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PagamentoRoute = PagamentoRouteImport.update({
+  id: '/pagamento',
+  path: '/pagamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PerfilRoute = PerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -34,6 +41,11 @@ const PerfilRoute = PerfilRouteImport.update({
 const NftsNftIdRoute = NftsNftIdRouteImport.update({
   id: '/nfts/$nftId',
   path: '/nfts/$nftId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidosOrderIdRoute = PedidosOrderIdRouteImport.update({
+  id: '/pedidos/$orderId',
+  path: '/pedidos/$orderId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerfilIndexRoute = PerfilIndexRouteImport.update({
@@ -50,15 +62,19 @@ const PerfilCarteirasRoute = PerfilCarteirasRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
+  '/pagamento': typeof PagamentoRoute
   '/perfil': typeof PerfilRouteWithChildren
   '/nfts/$nftId': typeof NftsNftIdRoute
+  '/pedidos/$orderId': typeof PedidosOrderIdRoute
   '/perfil/carteiras': typeof PerfilCarteirasRoute
   '/perfil/': typeof PerfilIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
+  '/pagamento': typeof PagamentoRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
+  '/pedidos/$orderId': typeof PedidosOrderIdRoute
   '/perfil/carteiras': typeof PerfilCarteirasRoute
   '/perfil': typeof PerfilIndexRoute
 }
@@ -66,8 +82,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/carrinho': typeof CarrinhoRoute
+  '/pagamento': typeof PagamentoRoute
   '/perfil': typeof PerfilRouteWithChildren
   '/nfts/$nftId': typeof NftsNftIdRoute
+  '/pedidos/$orderId': typeof PedidosOrderIdRoute
   '/perfil/carteiras': typeof PerfilCarteirasRoute
   '/perfil/': typeof PerfilIndexRoute
 }
@@ -76,18 +94,29 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/carrinho'
+    | '/pagamento'
     | '/perfil'
     | '/nfts/$nftId'
+    | '/pedidos/$orderId'
     | '/perfil/carteiras'
     | '/perfil/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/carrinho' | '/nfts/$nftId' | '/perfil/carteiras' | '/perfil'
+  to:
+    | '/'
+    | '/carrinho'
+    | '/pagamento'
+    | '/nfts/$nftId'
+    | '/pedidos/$orderId'
+    | '/perfil/carteiras'
+    | '/perfil'
   id:
     | '__root__'
     | '/'
     | '/carrinho'
+    | '/pagamento'
     | '/perfil'
     | '/nfts/$nftId'
+    | '/pedidos/$orderId'
     | '/perfil/carteiras'
     | '/perfil/'
   fileRoutesById: FileRoutesById
@@ -95,8 +124,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  PagamentoRoute: typeof PagamentoRoute
   PerfilRoute: typeof PerfilRouteWithChildren
   NftsNftIdRoute: typeof NftsNftIdRoute
+  PedidosOrderIdRoute: typeof PedidosOrderIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CarrinhoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pagamento': {
+      id: '/pagamento'
+      path: '/pagamento'
+      fullPath: '/pagamento'
+      preLoaderRoute: typeof PagamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/perfil': {
       id: '/perfil'
       path: '/perfil'
@@ -127,6 +165,13 @@ declare module '@tanstack/react-router' {
       path: '/nfts/$nftId'
       fullPath: '/nfts/$nftId'
       preLoaderRoute: typeof NftsNftIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedidos/$orderId': {
+      id: '/pedidos/$orderId'
+      path: '/pedidos/$orderId'
+      fullPath: '/pedidos/$orderId'
+      preLoaderRoute: typeof PedidosOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perfil/': {
@@ -162,8 +207,10 @@ const PerfilRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CarrinhoRoute: CarrinhoRoute,
+  PagamentoRoute: PagamentoRoute,
   PerfilRoute: PerfilRouteWithChildren,
   NftsNftIdRoute: NftsNftIdRoute,
+  PedidosOrderIdRoute: PedidosOrderIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

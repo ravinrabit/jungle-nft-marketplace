@@ -157,7 +157,7 @@ export function SiteFooter() {
               <span aria-hidden="true" className="w-px self-stretch bg-primary" />
             </div>
           ))}
-          <div className="flex w-[22.3125rem] shrink-0 flex-col gap-3 px-4">
+          <div className="flex w-[17rem] shrink-0 flex-col gap-3 px-4 xl:w-[22.3125rem]">
             <NewsletterForm />
             <p className="text-[0.8125rem] leading-[1.375rem] text-text-secondary">
               Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
@@ -167,9 +167,9 @@ export function SiteFooter() {
       </section>
 
       <div className="flex h-[5.5rem] items-center justify-center bg-surface-dark px-8">
-        <div className="grid w-full max-w-[71rem] grid-cols-[1fr_1fr_1fr_14.25rem] items-center gap-[5.75rem] text-sm leading-[1.375rem] text-foreground">
+        <div className="grid w-full max-w-[71rem] grid-cols-[1fr_1fr_1fr_14.25rem] items-center gap-6 text-sm leading-[1.375rem] text-foreground xl:gap-[5.75rem]">
           <span className="font-bold tracking-[0.1em]">KURIO</span>
-          <span className="w-[13.6875rem]">Feito para colecionadores, criadores e cultura</span>
+          <span className="max-w-[13.6875rem]">Feito para colecionadores, criadores e cultura</span>
           <a href="mailto:contato@email.com" className="hover:text-text-accent">
             contato@email.com
           </a>
@@ -180,7 +180,7 @@ export function SiteFooter() {
       </div>
 
       <div className="flex min-h-[14.75rem] items-center justify-center bg-surface-card px-8 py-8">
-        <div className="grid w-full max-w-[71rem] grid-cols-[1fr_1fr_1fr_14.25rem] gap-[7.75rem]">
+        <div className="grid w-full max-w-[71rem] grid-cols-[1fr_1fr_1fr_14.25rem] gap-8 xl:gap-[7.75rem]">
           <nav aria-labelledby="footer-perfil" className="flex flex-col gap-2">
             <h2 id="footer-perfil" className={COLUMN_TITLE}>
               Meu perfil

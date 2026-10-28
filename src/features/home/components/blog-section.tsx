@@ -65,7 +65,7 @@ export function BlogSection() {
                 <NftArtwork
                   artwork={post.artwork}
                   alt=""
-                  sizes="(min-width: 1024px) 268px, 50vw"
+                  sizes="(min-width: 900px) 268px, 50vw"
                   className="h-full object-cover"
                 />
               </div>

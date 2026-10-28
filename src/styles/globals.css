@@ -45,6 +45,7 @@
 }
 
 @theme inline {
+  --breakpoint-lg: 56.25rem;
   --font-sans: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 

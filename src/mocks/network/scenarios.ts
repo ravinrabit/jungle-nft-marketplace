@@ -17,6 +17,12 @@ export interface MockScenario {
   catalog: CatalogDataset
   sessionTtlMs?: number
   failFavorites?: boolean
+  rejectWalletConnection?: boolean
+  declinePayments?: boolean
+  dropFirstOrderResponse?: boolean
+  changePriceDuringCheckout?: boolean
+  realtimeChaos?: boolean
+  realtimeOffline?: boolean
 }
 
 export const DEFAULT_SESSION_TTL_MS = 30 * 60_000
@@ -124,6 +130,64 @@ export const MOCK_SCENARIOS = [
     failure: 'none',
     catalog: 'default',
     failFavorites: true,
+  },
+  {
+    id: 'wallet-rejected',
+    label: 'Carteira recusa a conexão',
+    description: 'A carteira recusa toda tentativa de conexão no pagamento.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    rejectWalletConnection: true,
+  },
+  {
+    id: 'payment-declined',
+    label: 'Pagamento recusado',
+    description: 'O pedido é criado como pendente e depois recusado pela carteira.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    declinePayments: true,
+  },
+  {
+    id: 'order-timeout',
+    label: 'Resposta do pedido perdida',
+    description:
+      'O servidor cria o pedido, mas a primeira resposta nunca chega; a nova tentativa com a mesma chave de idempotência recupera o mesmo pedido.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    dropFirstOrderResponse: true,
+  },
+  {
+    id: 'price-change-checkout',
+    label: 'Preço muda no checkout',
+    description:
+      'Logo depois de conectar a carteira, o preço do primeiro item do carrinho sobe 0.05 ETH e o evento chega pelo tempo real.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    changePriceDuringCheckout: true,
+  },
+  {
+    id: 'realtime-chaos',
+    label: 'Tempo real instável',
+    description:
+      'Cada evento chega duplicado e seguido de uma versão antiga, e a conexão cai a cada 20 segundos.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    realtimeChaos: true,
+  },
+  {
+    id: 'realtime-offline',
+    label: 'Tempo real indisponível',
+    description:
+      'O servidor de tempo real recusa conexões; a interface usa consultas periódicas como alternativa.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    realtimeOffline: true,
   },
 ] as const satisfies readonly MockScenario[]
 

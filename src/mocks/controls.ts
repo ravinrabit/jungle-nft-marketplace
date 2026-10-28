@@ -1,6 +1,10 @@
+import type { EditionKind } from '@/shared/api/contracts/catalog'
 import { database } from './db/database'
+import { disconnectAllWallets } from './domain/orders'
 import { expireAllSessions } from './domain/sessions'
 import { resetNetworkSequence } from './network/network-conditions'
+import { updateEditionAvailability, updateEditionPrice } from './realtime/market-events'
+import { disconnectAllSubscribers } from './realtime/realtime-hub'
 import {
   isMockScenarioId,
   MOCK_SCENARIOS,
@@ -18,6 +22,10 @@ export interface MockControls {
   setScenario: (id: MockScenarioId) => void
   reset: () => Promise<void>
   expireSessions: () => void
+  disconnectWallets: () => void
+  setEditionPrice: (nftId: string, editionKind: EditionKind, price: string) => boolean
+  setEditionAvailability: (nftId: string, editionKind: EditionKind, available: number) => boolean
+  disconnectRealtime: () => void
 }
 
 declare global {
@@ -65,5 +73,9 @@ export function exposeMockControls() {
     },
     reset: resetMockEnvironment,
     expireSessions: expireAllSessions,
+    disconnectWallets: disconnectAllWallets,
+    setEditionPrice: updateEditionPrice,
+    setEditionAvailability: updateEditionAvailability,
+    disconnectRealtime: disconnectAllSubscribers,
   }
 }

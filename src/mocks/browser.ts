@@ -2,6 +2,7 @@ import { setupWorker } from 'msw/browser'
 import { applyUrlControls, exposeMockControls } from './controls'
 import { database } from './db/database'
 import { handlers } from './handlers'
+import { schedulePendingSettlements } from './realtime/market-events'
 
 export const worker = setupWorker(...handlers)
 
@@ -14,4 +15,5 @@ export async function startMockEnvironment() {
     onUnhandledRequest: 'bypass',
     quiet: true,
   })
+  schedulePendingSettlements()
 }

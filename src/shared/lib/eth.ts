@@ -56,6 +56,10 @@ export function formatEth(amount: string) {
   return `${formatEthValue(amount)} ETH`
 }
 
+export function formatEthDiscount(amount: string) {
+  return isZeroEth(amount) ? '(-) 00.00' : `(-) ${formatEth(amount)}`
+}
+
 function decimalPlaces(value: Big) {
   const [, fraction = ''] = value.toFixed().split('.')
   return fraction.length

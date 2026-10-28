@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { useId, useState, type SubmitEvent } from 'react'
 import type { Quote } from '@/shared/api/contracts/commerce'
 import { cn } from '@/shared/lib/cn'
-import { formatEth, isZeroEth } from '@/shared/lib/eth'
+import { formatEth, formatEthDiscount } from '@/shared/lib/eth'
 import { Skeleton } from '@/shared/ui/skeleton'
 
 export interface CouponControls {
@@ -26,10 +26,6 @@ interface CartSummaryProps {
   isQuoteRefreshing: boolean
   coupon: CouponControls
   checkout: CheckoutControls
-}
-
-function formatDiscount(discount: string) {
-  return isZeroEth(discount) ? '(-) 00.00' : `(-) ${formatEth(discount)}`
 }
 
 function CouponForm({
@@ -155,22 +151,22 @@ function SummaryRows({
 
   return (
     <dl className="flex flex-col gap-3 text-[0.9375rem] leading-none text-foreground">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <dt>Subtotal</dt>
         <dd className={cn(valueSize, 'leading-4')}>{formatEth(quote.subtotal)}</dd>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <dt>Desconto do lançamento</dt>
-        <dd>{formatDiscount(quote.discount)}</dd>
+        <dd>{formatEthDiscount(quote.discount)}</dd>
       </div>
       <div className="flex flex-col gap-3 lg:gap-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <dt>Taxa de rede</dt>
           <dd className={cn(valueSize, 'leading-4')}>{formatEth(quote.networkFee)}</dd>
         </div>
         <p className="self-end text-xs leading-4 text-text-accent lg:self-end">Taxa estimada</p>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <dt className="text-base leading-4 font-bold">Total</dt>
         <dd className="text-lg leading-4 font-bold text-text-accent">{formatEth(quote.total)}</dd>
       </div>
@@ -216,7 +212,7 @@ export function DesktopCartSummary(props: CartSummaryProps) {
     <aside
       aria-labelledby="resumo-carteira"
       aria-busy={props.isQuoteRefreshing}
-      className="hidden w-[20.75rem] shrink-0 flex-col gap-6 lg:flex"
+      className="hidden w-[17.5rem] shrink-0 flex-col gap-6 lg:flex xl:w-[20.75rem]"
     >
       <div className="flex flex-col gap-3">
         <h2 id="resumo-carteira" className="text-lg leading-4 font-bold text-foreground">

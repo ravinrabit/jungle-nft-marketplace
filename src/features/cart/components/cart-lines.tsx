@@ -56,7 +56,7 @@ export function CartTableRow({ item }: { item: CartItem }) {
 
   return (
     <li className="flex min-h-[4.375rem] items-center justify-between bg-surface-card pr-6">
-      <div className="flex w-[15.625rem] items-center gap-4">
+      <div className="flex w-[12.5rem] items-center gap-4 xl:w-[15.625rem]">
         <NftArtwork
           artwork={item.artwork}
           alt={item.imageAlt}

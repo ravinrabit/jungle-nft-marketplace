@@ -53,7 +53,7 @@ export function PromoCards() {
             <NftArtwork
               artwork={promo.artwork}
               alt={promo.imageAlt}
-              sizes="(min-width: 1024px) 292px, 50vw"
+              sizes="(min-width: 900px) 292px, 50vw"
               className="h-full object-cover"
             />
           </div>

@@ -5,10 +5,17 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/react-query'
+import type { Session } from '@/shared/api/contracts/account'
 import type { Cart, Favorites, QuoteRequest } from '@/shared/api/contracts/commerce'
 import { getErrorMessage, hasErrorCode } from '@/shared/api/api-error'
 import { useSession } from '@/features/auth/api/auth-queries'
-import { privateQueryKey } from '@/features/auth/session-lifecycle'
+import {
+  authKeys,
+  isSessionActive,
+  PRIVATE_QUERY_ROOT,
+  privateQueryKey,
+} from '@/features/auth/session-lifecycle'
+import { sessionToken } from '@/features/auth/session-token'
 import { catalogKeys } from '@/features/catalog/api/catalog-queries'
 import { guestCartId } from '../guest-cart-id'
 import {
@@ -32,9 +39,26 @@ export const cartKeys = {
   favorites: (userId: string) => [...privateQueryKey(userId), 'favorites'] as const,
 }
 
+const PENDING_SESSION_OWNER: CartOwnerKey = [PRIVATE_QUERY_ROOT, 'sessao-pendente']
+
+function guestOwner(): CartOwnerKey {
+  return [GUEST_CART_ROOT, guestCartId.ensure()]
+}
+
 export function useCartOwner(): CartOwnerKey {
-  const { user } = useSession()
-  return user ? privateQueryKey(user.id) : [GUEST_CART_ROOT, guestCartId.ensure()]
+  const { user, isResolving } = useSession()
+  if (user) {
+    return privateQueryKey(user.id)
+  }
+  return isResolving && sessionToken.read() ? PENDING_SESSION_OWNER : guestOwner()
+}
+
+function currentCartOwner(queryClient: QueryClient): CartOwnerKey | null {
+  if (!sessionToken.read()) {
+    return guestOwner()
+  }
+  const session = queryClient.getQueryData<Session | null>(authKeys.session)
+  return isSessionActive(session) ? privateQueryKey(session.user.id) : null
 }
 
 export function cartQueryOptions(owner: CartOwnerKey) {
@@ -58,14 +82,24 @@ export function quoteQueryOptions(owner: CartOwnerKey, cartVersion: number, requ
 
 export function useCart() {
   const owner = useCartOwner()
-  return { owner, query: useQuery(cartQueryOptions(owner)) }
+  const query = useQuery({
+    ...cartQueryOptions(owner),
+    enabled: owner !== PENDING_SESSION_OWNER,
+  })
+  return { owner, query }
 }
 
 function useApplyCart() {
   const queryClient = useQueryClient()
-  const owner = useCartOwner()
   return (cart: Cart) => {
-    queryClient.setQueryData(cartKeys.cart(owner), cart)
+    const owner = currentCartOwner(queryClient)
+    if (owner) {
+      queryClient.setQueryData(cartKeys.cart(owner), cart)
+    } else {
+      void queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey.at(-1) === 'cart',
+      })
+    }
   }
 }
 

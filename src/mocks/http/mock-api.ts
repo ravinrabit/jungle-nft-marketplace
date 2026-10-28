@@ -28,6 +28,14 @@ export const mockApi = {
     http.delete(apiPath(path), withNetworkConditions(resolver)),
 }
 
+export async function readJson(request: Request): Promise<unknown> {
+  try {
+    return await request.json()
+  } catch {
+    return null
+  }
+}
+
 export function readPathParam(value: string | readonly string[] | undefined) {
   if (typeof value === 'string') {
     return value

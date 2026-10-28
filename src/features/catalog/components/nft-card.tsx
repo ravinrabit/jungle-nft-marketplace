@@ -6,8 +6,7 @@ import { useAddToCartAction, useFavoriteAction } from '@/features/cart/use-cart-
 import { RARITY_LABELS } from '../catalog-labels'
 import { NftArtwork } from './nft-artwork'
 
-const CARD_IMAGE_SIZES =
-  '(min-width: 1280px) 250px, (min-width: 1024px) 30vw, (min-width: 768px) 30vw, 45vw'
+const CARD_IMAGE_SIZES = '(min-width: 1280px) 250px, (min-width: 768px) 30vw, 45vw'
 
 const ROUND_ACTION =
   'flex size-7 cursor-pointer items-center justify-center rounded-full border border-border bg-surface-raised text-primary transition-colors hover:bg-primary hover:text-ink'

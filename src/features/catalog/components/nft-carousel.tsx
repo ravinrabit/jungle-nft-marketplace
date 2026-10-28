@@ -15,7 +15,7 @@ function CarouselCard({ nft }: { nft: NftSummary }) {
         <NftArtwork
           artwork={nft.artwork}
           alt={nft.imageAlt}
-          sizes="(min-width: 1024px) 212px, 45vw"
+          sizes="(min-width: 900px) 212px, 45vw"
           className="rounded-[0.8125rem] transition-transform duration-300 group-hover:scale-[1.02]"
         />
       </div>

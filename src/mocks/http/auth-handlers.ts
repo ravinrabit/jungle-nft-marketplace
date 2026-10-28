@@ -11,16 +11,8 @@ import {
   toSessionPayload,
 } from '@/mocks/domain/sessions'
 import { hashPassword, verifyPassword } from '@/mocks/lib/password-hash'
-import { mockApi } from './mock-api'
+import { mockApi, readJson } from './mock-api'
 import { apiError, validationError } from './responses'
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return await request.json()
-  } catch {
-    return null
-  }
-}
 
 function findRegistrationConflicts(email: string, username: string): FieldErrors {
   return database.read((state) => {

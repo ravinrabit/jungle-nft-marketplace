@@ -226,6 +226,21 @@ function collectIssues(item: CartItem, limit: number): QuoteIssue[] {
   return issues
 }
 
+const MAX_STORED_QUOTES_PER_OWNER = 5
+
+export function storeQuote(state: MockDatabaseState, owner: CartOwner, quote: Quote) {
+  const key = ownerKey(owner)
+  const previous = state.quotes.filter((stored) => stored.ownerKey === key)
+  const keep = new Set(previous.slice(-MAX_STORED_QUOTES_PER_OWNER + 1).map(({ id }) => id))
+  state.quotes = state.quotes.filter((stored) => stored.ownerKey !== key || keep.has(stored.id))
+  state.quotes.push({ ...quote, ownerKey: key })
+}
+
+export function findQuote(state: Readonly<MockDatabaseState>, owner: CartOwner, quoteId: string) {
+  const key = ownerKey(owner)
+  return state.quotes.find((quote) => quote.id === quoteId && quote.ownerKey === key)
+}
+
 export function buildQuote(
   cart: Cart,
   coupon: CouponFixture | null,
