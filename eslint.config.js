@@ -86,4 +86,10 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
+  {
+    files: ['tests/**/*.ts'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
 )
