@@ -1,7 +1,12 @@
 import { HttpResponse } from 'msw'
 import { nftListQuerySchema } from '@/shared/api/contracts/catalog'
 import { database } from '@/mocks/db/database'
-import { queryCatalog, toNftDetail } from '@/mocks/domain/catalog-query'
+import {
+  queryCatalog,
+  selectFeatured,
+  selectRelated,
+  toNftDetail,
+} from '@/mocks/domain/catalog-query'
 import { getActiveScenario } from '@/mocks/network/scenarios'
 import { mockApi, readPathParam } from './mock-api'
 import { notFound, validationError } from './responses'
@@ -32,6 +37,25 @@ export const catalogHandlers = [
       getActiveScenario().catalog === 'empty' ? [] : database.read((state) => state.nfts)
 
     return HttpResponse.json(queryCatalog(records, query.data))
+  }),
+
+  mockApi.get('/nfts/featured', () => {
+    const featured =
+      getActiveScenario().catalog === 'empty'
+        ? null
+        : database.read((state) => selectFeatured(state.nfts))
+
+    return featured ? HttpResponse.json(featured) : notFound('Nenhum destaque disponível.')
+  }),
+
+  mockApi.get('/nfts/:nftId/related', ({ params }) => {
+    const nftId = readPathParam(params.nftId)
+    const items = database.read((state) => {
+      const source = state.nfts.find((nft) => nft.id === nftId)
+      return source ? selectRelated(state.nfts, source) : null
+    })
+
+    return items ? HttpResponse.json({ items }) : notFound('NFT não encontrado.')
   }),
 
   mockApi.get('/nfts/:nftId', ({ params }) => {

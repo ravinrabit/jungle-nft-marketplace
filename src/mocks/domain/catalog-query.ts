@@ -4,6 +4,7 @@ import {
   type CatalogFacets,
   type CatalogSort,
   type CatalogTab,
+  type FeaturedNftsResponse,
   type NftDetail,
   type NftListQuery,
   type NftListResponse,
@@ -12,7 +13,10 @@ import {
 import { compareEth } from '@/shared/lib/eth'
 import {
   CATALOG_REFERENCE_DATE,
+  FEATURED_HERO_IDS,
+  FEATURED_SPOTLIGHT_ID,
   NEW_RELEASE_WINDOW_DAYS,
+  RELATED_NFTS_LIMIT,
   TRENDING_SCORE_THRESHOLD,
 } from '@/mocks/db/fixtures/catalog-fixtures'
 import type { NftRecord } from '@/mocks/db/records'
@@ -105,6 +109,35 @@ function buildFacets(records: readonly NftRecord[]): CatalogFacets {
     })),
     priceRange: min !== undefined && max !== undefined ? { min, max } : null,
   }
+}
+
+export function selectFeatured(records: readonly NftRecord[]): FeaturedNftsResponse | null {
+  const byId = new Map(records.map((record) => [record.id, record]))
+  const hero = FEATURED_HERO_IDS.flatMap((id) => {
+    const record = byId.get(id)
+    return record ? [toNftSummary(record)] : []
+  })
+  const spotlight = byId.get(FEATURED_SPOTLIGHT_ID)
+
+  if (hero.length === 0 || !spotlight) {
+    return null
+  }
+
+  return { hero, spotlight: toNftSummary(spotlight) }
+}
+
+function byTrending(left: NftRecord, right: NftRecord) {
+  return right.trendingScore - left.trendingScore || left.id.localeCompare(right.id)
+}
+
+export function selectRelated(records: readonly NftRecord[], source: NftRecord) {
+  const others = records.filter((record) => record.id !== source.id)
+  const sameCategory = others
+    .filter((record) => record.category === source.category)
+    .sort(byTrending)
+  const remaining = others.filter((record) => record.category !== source.category).sort(byTrending)
+
+  return [...sameCategory, ...remaining].slice(0, RELATED_NFTS_LIMIT).map(toNftSummary)
 }
 
 export function queryCatalog(records: readonly NftRecord[], query: NftListQuery): NftListResponse {

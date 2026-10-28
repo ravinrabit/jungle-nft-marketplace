@@ -1,7 +1,6 @@
 import { Search } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { MAX_SEARCH_LENGTH } from '@/shared/api/contracts/catalog'
-import { Input } from '@/shared/ui/input'
 
 const SEARCH_DEBOUNCE_MS = 350
 
@@ -38,7 +37,7 @@ export function CatalogSearchField({ value, onSearch }: CatalogSearchFieldProps)
   return (
     <form
       role="search"
-      className="relative"
+      className="relative min-w-0 flex-1"
       onSubmit={(event) => {
         event.preventDefault()
         onSearch(draft.trim() || undefined)
@@ -49,16 +48,16 @@ export function CatalogSearchField({ value, onSearch }: CatalogSearchFieldProps)
       </label>
       <Search
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-text-secondary"
+        className="pointer-events-none absolute top-1/2 left-3 size-[1.375rem] -translate-y-1/2 text-price-muted"
       />
-      <Input
+      <input
         id={inputId}
         type="search"
         value={draft}
         maxLength={MAX_SEARCH_LENGTH}
         placeholder="Explorar coleções"
         autoComplete="off"
-        className="pl-11"
+        className="h-[2.8125rem] w-full rounded-[0.625rem] border border-transparent bg-surface-card pr-3 pl-[2.625rem] text-sm leading-4 font-bold text-foreground outline-none placeholder:text-price-muted focus-visible:border-primary"
         onChange={(event) => {
           setDraft(event.target.value)
         }}

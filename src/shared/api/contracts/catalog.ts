@@ -62,6 +62,14 @@ export const nftSummarySchema = z.object({
   version: versionSchema,
 })
 
+export const reviewSchema = z.object({
+  id: entityIdSchema,
+  authorName: z.string(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string(),
+  createdAt: isoDateTimeSchema,
+})
+
 export const nftDetailSchema = nftSummarySchema.extend({
   description: z.string(),
   story: z.array(z.string()),
@@ -70,6 +78,7 @@ export const nftDetailSchema = nftSummarySchema.extend({
   attributes: z.array(z.string()),
   gallery: z.array(artworkSlugSchema).min(1),
   rating: z.object({ average: z.string(), count: z.number().int().nonnegative() }),
+  reviews: z.array(reviewSchema),
   royaltyPercent: z.number().nonnegative(),
   contractAddress: z.string(),
   defaultEdition: editionKindSchema,
@@ -88,6 +97,15 @@ export const catalogFacetsSchema = z.object({
 
 export const nftListResponseSchema = paginatedSchema(nftSummarySchema).extend({
   facets: catalogFacetsSchema,
+})
+
+export const featuredNftsResponseSchema = z.object({
+  hero: z.array(nftSummarySchema).min(1),
+  spotlight: nftSummarySchema,
+})
+
+export const relatedNftsResponseSchema = z.object({
+  items: z.array(nftSummarySchema),
 })
 
 export const nftListQuerySchema = z
@@ -120,5 +138,8 @@ export type NftSummary = z.infer<typeof nftSummarySchema>
 export type NftDetail = z.infer<typeof nftDetailSchema>
 export type CatalogFacets = z.infer<typeof catalogFacetsSchema>
 export type NftListResponse = z.infer<typeof nftListResponseSchema>
+export type Review = z.infer<typeof reviewSchema>
+export type FeaturedNftsResponse = z.infer<typeof featuredNftsResponseSchema>
+export type RelatedNftsResponse = z.infer<typeof relatedNftsResponseSchema>
 export type NftListParams = z.input<typeof nftListQuerySchema>
 export type NftListQuery = z.output<typeof nftListQuerySchema>

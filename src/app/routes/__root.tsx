@@ -1,5 +1,9 @@
-import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import type { RouterContext } from '@/app/router'
+import { MobileTabBar } from '@/app/layout/mobile-tab-bar'
+import { SiteFooter } from '@/app/layout/site-footer'
+import { SiteHeader } from '@/app/layout/site-header'
+import { Toaster } from '@/shared/ui/sonner'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
@@ -7,17 +11,29 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootLayout() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+
   return (
     <>
       <a
         href="#conteudo"
-        className="sr-only z-50 rounded-sm bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
+        className="sr-only z-50 rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:top-4 focus:left-4"
       >
         Pular para o conteúdo
       </a>
-      <main id="conteudo" className="mx-auto w-full max-w-content px-4 md:px-6">
-        <Outlet />
-      </main>
+      <div className="mx-auto flex min-h-dvh w-full max-w-[75rem] flex-col px-6 pt-10 pb-36 lg:px-6 lg:pt-6 lg:pb-6 xl:px-0">
+        <div className="hidden lg:block">
+          <SiteHeader showDivider={pathname === '/'} />
+        </div>
+        <main id="conteudo" tabIndex={-1} className="flex-1 outline-none lg:pt-8">
+          <Outlet />
+        </main>
+        <div className="hidden pt-24 lg:block">
+          <SiteFooter />
+        </div>
+      </div>
+      <MobileTabBar />
+      <Toaster position="top-center" />
     </>
   )
 }
@@ -29,7 +45,7 @@ function NotFoundPage() {
       <p className="text-text-secondary">O endereço acessado não existe ou foi removido.</p>
       <Link
         to="/"
-        className="rounded-sm bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary-light"
+        className="rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary-light"
       >
         Voltar ao início
       </Link>

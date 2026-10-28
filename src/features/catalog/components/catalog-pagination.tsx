@@ -9,7 +9,7 @@ interface CatalogPaginationProps {
 }
 
 const PAGE_LINK_CLASSES =
-  'inline-flex size-8 items-center justify-center rounded-sm border border-border text-sm transition-colors hover:border-primary hover:text-text-accent'
+  'inline-flex size-[2.1875rem] items-center justify-center rounded border border-border text-lg leading-4 text-foreground transition-colors hover:border-primary hover:text-text-accent'
 
 function pageSearch(page: number) {
   return (previous: CatalogSearch): CatalogSearch => ({
@@ -33,10 +33,11 @@ export function CatalogPagination({ page, totalPages }: CatalogPaginationProps) 
             <Link
               to="/"
               search={pageSearch(page - 1)}
+              hash="catalogo"
               className={PAGE_LINK_CLASSES}
               aria-label="Página anterior"
             >
-              <ChevronLeft aria-hidden="true" className="size-4" />
+              <ChevronLeft aria-hidden="true" className="size-[1.125rem]" />
             </Link>
           </li>
         )}
@@ -47,6 +48,7 @@ export function CatalogPagination({ page, totalPages }: CatalogPaginationProps) 
               <Link
                 to="/"
                 search={pageSearch(pageNumber)}
+                hash="catalogo"
                 aria-current={isCurrent ? 'page' : undefined}
                 aria-label={`Página ${pageNumber}`}
                 className={cn(
@@ -64,10 +66,11 @@ export function CatalogPagination({ page, totalPages }: CatalogPaginationProps) 
             <Link
               to="/"
               search={pageSearch(page + 1)}
+              hash="catalogo"
               className={PAGE_LINK_CLASSES}
               aria-label="Próxima página"
             >
-              <ChevronRight aria-hidden="true" className="size-4" />
+              <ChevronRight aria-hidden="true" className="size-[1.125rem]" />
             </Link>
           </li>
         )}

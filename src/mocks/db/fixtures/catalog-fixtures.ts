@@ -20,6 +20,9 @@ import type { NftRecord } from '../records'
 export const CATALOG_REFERENCE_DATE = new Date(Date.UTC(2026, 9, 1, 12, 0, 0))
 export const NEW_RELEASE_WINDOW_DAYS = 14
 export const TRENDING_SCORE_THRESHOLD = 70
+export const FEATURED_HERO_IDS = ['emerald-ape-042', 'ivory-baron-088', 'golden-beat-207'] as const
+export const FEATURED_SPOTLIGHT_ID = 'sage-nomad-009'
+export const RELATED_NFTS_LIMIT = 15
 
 const CATALOG_SEED = 20_261_001
 const GENERATED_NFT_COUNT = 30
@@ -205,6 +208,43 @@ const CURATED_NFTS: readonly CuratedNft[] = [
 
 const EXTREME_PRICES = ['0.02', '12.30'] as const
 
+const REVIEW_AUTHORS = [
+  'Lia Fontes',
+  'Rafael Cury',
+  'Marina Saito',
+  'Caio Brandão',
+  'Bianca Lobo',
+  'Tomás Vidal',
+  'Helena Duarte',
+  'Igor Matsuda',
+] as const
+
+const REVIEW_COMMENTS = [
+  'Acabamento impecável e metadados completos. A arte desbloqueável vale cada ETH.',
+  'Comprei a edição 1/50 e a entrega na carteira foi imediata. Recomendo.',
+  'Paleta linda e procedência clara. Um dos destaques da minha coleção.',
+  'Ótima obra, mas gostaria de mais detalhes sobre os direitos de uso.',
+  'O criador mantém a comunidade ativa e os lançamentos são consistentes.',
+  'Visual marcante em alta resolução. Fica ótimo em exibição digital.',
+] as const
+
+function buildReviews(random: RandomSource, listedAt: Date) {
+  const reviews = Array.from({ length: randomInteger(random, 3, 8) }, (_, index) => ({
+    id: `review-${randomHex(random, 8)}`,
+    authorName:
+      REVIEW_AUTHORS[randomInteger(random, 0, REVIEW_AUTHORS.length - 1)] ?? 'Colecionador',
+    rating: random() < 0.75 ? 5 : 4,
+    comment: REVIEW_COMMENTS[randomInteger(random, 0, REVIEW_COMMENTS.length - 1)] ?? '',
+    createdAt: new Date(listedAt.getTime() + (index + 1) * DAY_IN_MS).toISOString(),
+  }))
+  const total = reviews.reduce((sum, review) => sum + review.rating, 0)
+
+  return {
+    reviews,
+    rating: { average: (total / reviews.length).toFixed(1), count: reviews.length },
+  }
+}
+
 function buildEditions(basePrice: string, random: RandomSource, isSoldOut: boolean): Edition[] {
   const availableOrZero = (amount: number) => (isSoldOut ? 0 : amount)
 
@@ -275,10 +315,7 @@ function buildRecord(entry: CuratedNft, random: RandomSource, index: number): Nf
     creatorName: profile.creatorName,
     attributes: [...profile.attributes, ...rarityAttribute],
     gallery: [entry.artwork, entry.artwork, entry.artwork, entry.artwork],
-    rating: {
-      average: (4 + random()).toFixed(1),
-      count: randomInteger(random, 3, 60),
-    },
+    ...buildReviews(random, listedAt),
     royaltyPercent: 5,
     contractAddress: `0x${randomHex(random, 40)}`,
     defaultEdition: '1-50',

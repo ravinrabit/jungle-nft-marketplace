@@ -1,4 +1,4 @@
-import { useId, useState, type SubmitEvent } from 'react'
+import { useId, useState } from 'react'
 import {
   CATEGORY_IDS,
   NETWORK_IDS,
@@ -6,12 +6,10 @@ import {
   type CategoryId,
   type NetworkId,
 } from '@/shared/api/contracts/catalog'
-import { compareEth, isEthAmount } from '@/shared/lib/eth'
+import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
-import { Checkbox } from '@/shared/ui/checkbox'
-import { Input } from '@/shared/ui/input'
-import { Label } from '@/shared/ui/label'
-import { byLabel, CATEGORY_LABELS, NETWORK_LABELS } from '../catalog-labels'
+import { Slider } from '@/shared/ui/slider'
+import { CATEGORY_LABELS, NETWORK_LABELS } from '../catalog-labels'
 import type { CatalogSearch } from '../catalog-search'
 
 type FilterChange = Partial<
@@ -22,14 +20,18 @@ interface CatalogFiltersProps {
   search: CatalogSearch
   facets: CatalogFacets | undefined
   onChange: (change: FilterChange) => void
+  className?: string
 }
+
+const FALLBACK_PRICE_RANGE = { min: '0.02', max: '12.30' }
+const PRICE_STEP = 0.01
 
 function toggleValue<TValue extends string>(values: readonly TValue[] | undefined, value: TValue) {
   const current = values ?? []
   const next = current.includes(value)
     ? current.filter((item) => item !== value)
     : [...current, value]
-  return next.length > 0 ? next.sort() : undefined
+  return next.length > 0 ? [...next].sort() : undefined
 }
 
 function facetCount<TId extends string>(
@@ -39,179 +41,174 @@ function facetCount<TId extends string>(
   return entries?.find((entry) => entry.id === id)?.count
 }
 
-interface CheckboxGroupProps<TId extends string> {
+interface FilterListProps<TId extends string> {
   legend: string
   ids: readonly TId[]
   labels: Record<TId, string>
   selected: readonly TId[] | undefined
   counts: readonly { id: TId; count: number }[] | undefined
+  boldCounts: boolean
+  listClassName: string
   onToggle: (id: TId) => void
 }
 
-function CheckboxGroup<TId extends string>({
+function FilterList<TId extends string>({
   legend,
   ids,
   labels,
   selected,
   counts,
+  boldCounts,
+  listClassName,
   onToggle,
-}: CheckboxGroupProps<TId>) {
+}: FilterListProps<TId>) {
   const groupId = useId()
 
   return (
-    <fieldset className="flex flex-col gap-1">
-      <legend className="mb-3 text-lg leading-4 font-bold">{legend}</legend>
-      {[...ids].sort(byLabel(labels)).map((id) => {
-        const inputId = `${groupId}-${id}`
-        const isChecked = selected?.includes(id) ?? false
-        const count = facetCount(counts, id)
+    <fieldset className="flex flex-col">
+      <legend className="mb-3 text-lg leading-4 font-bold text-foreground">{legend}</legend>
+      <div className={listClassName}>
+        {ids.map((id) => {
+          const inputId = `${groupId}-${id}`
+          const isChecked = selected?.includes(id) ?? false
+          const count = facetCount(counts, id)
 
-        return (
-          <div key={id} className="flex min-h-10 items-center gap-3">
-            <Checkbox
-              id={inputId}
-              checked={isChecked}
-              onCheckedChange={() => {
-                onToggle(id)
-              }}
-            />
-            <Label
-              htmlFor={inputId}
-              className={
-                isChecked
-                  ? 'flex flex-1 cursor-pointer justify-between text-[0.9375rem] font-normal text-text-accent'
-                  : 'flex flex-1 cursor-pointer justify-between text-[0.9375rem] font-normal text-text-secondary'
-              }
-            >
-              <span>{labels[id]}</span>
-              {count !== undefined && <span aria-label={`${count} itens`}>({count})</span>}
-            </Label>
-          </div>
-        )
-      })}
+          return (
+            <div key={id} className="relative">
+              <input
+                id={inputId}
+                type="checkbox"
+                checked={isChecked}
+                className="peer sr-only"
+                onChange={() => {
+                  onToggle(id)
+                }}
+              />
+              <label
+                htmlFor={inputId}
+                className={cn(
+                  'flex h-10 cursor-pointer items-center justify-between text-[0.9375rem] leading-10 transition-colors hover:text-text-accent',
+                  'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring',
+                  isChecked ? 'font-bold text-text-accent' : 'text-text-secondary',
+                )}
+              >
+                <span>{labels[id]}</span>
+                {count !== undefined && (
+                  <span className={boldCounts ? 'font-bold' : 'font-normal'}>
+                    <span aria-hidden="true">({count})</span>
+                    <span className="sr-only">{`, ${count} itens`}</span>
+                  </span>
+                )}
+              </label>
+            </div>
+          )
+        })}
+      </div>
     </fieldset>
   )
 }
 
-function normalizePriceInput(value: string) {
-  return value.trim().replace(',', '.')
+function toSliderNumber(value: string) {
+  return Number(value)
 }
 
-function validatePriceRange(minPrice: string, maxPrice: string) {
-  if ((minPrice && !isEthAmount(minPrice)) || (maxPrice && !isEthAmount(maxPrice))) {
-    return 'Use números com ponto decimal, por exemplo 0.5'
-  }
-  if (minPrice && maxPrice && compareEth(minPrice, maxPrice) > 0) {
-    return 'O preço mínimo não pode ser maior que o máximo'
-  }
-  return null
+function toEthString(value: number) {
+  return value.toFixed(2)
 }
 
-interface PriceRangeFormProps {
+function formatBrazilianDecimal(value: number) {
+  return value.toFixed(2).replace('.', ',')
+}
+
+interface PriceRangeFilterProps {
   minPrice: string | undefined
   maxPrice: string | undefined
-  placeholderRange: CatalogFacets['priceRange'] | undefined
+  bounds: { min: string; max: string }
   onApply: (change: Pick<FilterChange, 'minPrice' | 'maxPrice'>) => void
 }
 
-function PriceRangeForm({ minPrice, maxPrice, placeholderRange, onApply }: PriceRangeFormProps) {
-  const formId = useId()
-  const errorId = `${formId}-error`
-  const [draftMin, setDraftMin] = useState(minPrice ?? '')
-  const [draftMax, setDraftMax] = useState(maxPrice ?? '')
-  const [error, setError] = useState<string | null>(null)
-
-  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const nextMin = normalizePriceInput(draftMin)
-    const nextMax = normalizePriceInput(draftMax)
-    const validationError = validatePriceRange(nextMin, nextMax)
-    setError(validationError)
-
-    if (!validationError) {
-      onApply({ minPrice: nextMin || undefined, maxPrice: nextMax || undefined })
-    }
-  }
+function PriceRangeFilter({ minPrice, maxPrice, bounds, onApply }: PriceRangeFilterProps) {
+  const titleId = useId()
+  const lowerBound = toSliderNumber(bounds.min)
+  const upperBound = toSliderNumber(bounds.max)
+  const [draft, setDraft] = useState<[number, number]>([
+    toSliderNumber(minPrice ?? bounds.min),
+    toSliderNumber(maxPrice ?? bounds.max),
+  ])
+  const [draftMin, draftMax] = draft
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-labelledby={`${formId}-title`}>
-      <h3 id={`${formId}-title`} className="mb-4 text-lg leading-4 font-bold">
+    <section aria-labelledby={titleId} className="flex flex-col gap-3">
+      <h3 id={titleId} className="text-lg leading-4 font-bold text-foreground">
         Faixa de preço
       </h3>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor={`${formId}-min`} className="text-xs text-text-secondary">
-            Mínimo (ETH)
-          </Label>
-          <Input
-            id={`${formId}-min`}
-            inputMode="decimal"
-            autoComplete="off"
-            value={draftMin}
-            placeholder={placeholderRange?.min ?? '0.00'}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
-            onChange={(event) => {
-              setDraftMin(event.target.value)
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor={`${formId}-max`} className="text-xs text-text-secondary">
-            Máximo (ETH)
-          </Label>
-          <Input
-            id={`${formId}-max`}
-            inputMode="decimal"
-            autoComplete="off"
-            value={draftMax}
-            placeholder={placeholderRange?.max ?? '0.00'}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
-            onChange={(event) => {
-              setDraftMax(event.target.value)
-            }}
-          />
-        </div>
-      </div>
-      {error && (
-        <p id={errorId} role="alert" className="mt-2 text-xs text-text-coral">
-          {error}
+      <div className="flex flex-col gap-3 pl-3">
+        <Slider
+          min={Math.min(lowerBound, draftMin)}
+          max={Math.max(upperBound, draftMax)}
+          step={PRICE_STEP}
+          minStepsBetweenThumbs={1}
+          value={draft}
+          thumbLabels={['Preço mínimo', 'Preço máximo']}
+          onValueChange={(values) => {
+            const [nextMin = lowerBound, nextMax = upperBound] = values
+            setDraft([nextMin, nextMax])
+          }}
+        />
+        <p className="text-[0.9375rem] leading-none text-foreground" aria-live="polite">
+          Preço: {formatBrazilianDecimal(draftMin)} - {formatBrazilianDecimal(draftMax)} ETH
         </p>
-      )}
-      <Button type="submit" size="sm" className="mt-4 font-bold">
-        Aplicar
-      </Button>
-    </form>
+        <Button
+          type="button"
+          className="h-9 w-[5.75rem] rounded-md px-3 py-2 text-base leading-5 font-bold"
+          onClick={() => {
+            const isFullRange = draftMin <= lowerBound && draftMax >= upperBound
+            onApply(
+              isFullRange
+                ? { minPrice: undefined, maxPrice: undefined }
+                : { minPrice: toEthString(draftMin), maxPrice: toEthString(draftMax) },
+            )
+          }}
+        >
+          Aplicar
+        </Button>
+      </div>
+    </section>
   )
 }
 
-export function CatalogFilters({ search, facets, onChange }: CatalogFiltersProps) {
+export function CatalogFilters({ search, facets, onChange, className }: CatalogFiltersProps) {
+  const bounds = facets?.priceRange ?? FALLBACK_PRICE_RANGE
+
   return (
-    <div className="flex flex-col gap-8 bg-surface-card p-5">
-      <CheckboxGroup<CategoryId>
+    <div className={cn('flex flex-col gap-10 bg-surface-card p-5', className)}>
+      <FilterList<CategoryId>
         legend="Coleções"
         ids={CATEGORY_IDS}
         labels={CATEGORY_LABELS}
         selected={search.categories}
         counts={facets?.categories}
+        boldCounts
+        listClassName="px-3"
         onToggle={(id) => {
           onChange({ categories: toggleValue(search.categories, id) })
         }}
       />
-      <PriceRangeForm
-        key={`${search.minPrice ?? ''}-${search.maxPrice ?? ''}`}
+      <PriceRangeFilter
+        key={`${search.minPrice ?? bounds.min}-${search.maxPrice ?? bounds.max}`}
         minPrice={search.minPrice}
         maxPrice={search.maxPrice}
-        placeholderRange={facets?.priceRange}
+        bounds={bounds}
         onApply={onChange}
       />
-      <CheckboxGroup<NetworkId>
+      <FilterList<NetworkId>
         legend="Rede"
         ids={NETWORK_IDS}
         labels={NETWORK_LABELS}
         selected={search.networks}
         counts={facets?.networks}
+        boldCounts={false}
+        listClassName="pl-3"
         onToggle={(id) => {
           onChange({ networks: toggleValue(search.networks, id) })
         }}

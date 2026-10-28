@@ -1,9 +1,9 @@
-import { createCatalogFixtures } from './fixtures/catalog-fixtures'
+﻿import { createCatalogFixtures } from './fixtures/catalog-fixtures'
 import { createUserFixtures, createWalletFixtures } from './fixtures/user-fixtures'
 import type { MockDatabaseState } from './records'
 
 const STORAGE_KEY = 'kurio:mock-db'
-const SCHEMA_VERSION = 1
+const SCHEMA_VERSION = 2
 
 async function createSeedState(): Promise<MockDatabaseState> {
   return {
