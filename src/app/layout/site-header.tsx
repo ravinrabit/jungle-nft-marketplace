@@ -1,5 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { LogIn, Search, ShoppingCart } from 'lucide-react'
+import { LogIn, Search } from 'lucide-react'
+import { CartLink } from '@/features/cart/components/cart-link'
 import { cn } from '@/shared/lib/cn'
 import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
 import { Skeleton } from '@/shared/ui/skeleton'
@@ -113,16 +114,10 @@ export function SiteHeader({ showDivider }: { showDivider: boolean }) {
               </button>
             }
           />
-          <button
-            type="button"
-            aria-label="Carrinho"
-            className="relative flex h-6 w-[1.9375rem] cursor-pointer items-center text-foreground hover:text-text-accent"
-            onClick={() => {
-              notifyUnavailableFeature('O carrinho')
-            }}
-          >
-            <ShoppingCart aria-hidden="true" className="size-6" />
-          </button>
+          <CartLink
+            className="flex h-6 w-[1.9375rem] items-center text-foreground hover:text-text-accent"
+            iconClassName="size-6"
+          />
           <AccountAction />
         </div>
       </header>

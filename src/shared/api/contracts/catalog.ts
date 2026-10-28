@@ -59,6 +59,7 @@ export const nftSummarySchema = z.object({
   price: ethAmountSchema,
   compareAtPrice: ethAmountSchema.nullable(),
   isAvailable: z.boolean(),
+  defaultEdition: editionKindSchema,
   version: versionSchema,
 })
 
@@ -81,7 +82,6 @@ export const nftDetailSchema = nftSummarySchema.extend({
   reviews: z.array(reviewSchema),
   royaltyPercent: z.number().nonnegative(),
   contractAddress: z.string(),
-  defaultEdition: editionKindSchema,
   editions: z.array(editionSchema).min(1),
   listedAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,

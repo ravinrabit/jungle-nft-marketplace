@@ -2,7 +2,7 @@ import { Link, useRouter } from '@tanstack/react-router'
 import { ArrowLeft, Heart, ShoppingCart, Star } from 'lucide-react'
 import type { EditionKind, NftDetail } from '@/shared/api/contracts/catalog'
 import { formatEth } from '@/shared/lib/eth'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { useAddToCartAction, useFavoriteAction } from '@/features/cart/use-cart-actions'
 import { QuantityStepper } from '@/shared/ui/quantity-stepper'
 import { usePurchaseSelection } from '../use-purchase-selection'
 import { EditionSelector } from './edition-selector'
@@ -54,11 +54,22 @@ export function NftDetailView({ nft, requestedEdition, onSelectEdition }: NftDet
   )
   const shareUrl = typeof window === 'undefined' ? '' : window.location.href
 
+  const { add, isAdding } = useAddToCartAction()
+  const favorites = useFavoriteAction()
+  const isFavorite = favorites.isFavorite(nft.id)
+  const purchase = { nftId: nft.id, name: nft.name, editionKind: edition.kind, quantity }
+  const canPurchase = isAvailable && !isAdding
+
   const handleBuy = () => {
-    notifyUnavailableFeature('A compra')
+    add(purchase, () => {
+      void router.navigate({ to: '/carrinho' })
+    })
+  }
+  const handleAddToCart = () => {
+    add(purchase)
   }
   const handleFavorite = () => {
-    notifyUnavailableFeature('Favoritar')
+    favorites.toggle(nft.id, nft.name)
   }
 
   return (
@@ -131,7 +142,8 @@ export function NftDetailView({ nft, requestedEdition, onSelectEdition }: NftDet
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      disabled={!isAvailable}
+                      disabled={!canPurchase}
+                      aria-busy={isAdding}
                       onClick={handleBuy}
                       className="h-10 w-[8.125rem] cursor-pointer rounded-md bg-primary text-sm leading-5 font-bold text-ink uppercase transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-50"
                     >
@@ -139,11 +151,16 @@ export function NftDetailView({ nft, requestedEdition, onSelectEdition }: NftDet
                     </button>
                     <button
                       type="button"
+                      aria-pressed={isFavorite}
                       onClick={handleFavorite}
                       className="flex h-10 w-[8.125rem] cursor-pointer items-center justify-center gap-2 rounded-md border border-primary text-sm leading-5 font-medium text-text-accent transition-colors hover:bg-surface-raised"
                     >
-                      <Heart aria-hidden="true" className="size-5" />
-                      Favoritar
+                      <Heart
+                        aria-hidden="true"
+                        className="size-5"
+                        fill={isFavorite ? 'currentColor' : 'none'}
+                      />
+                      {isFavorite ? 'Favoritado' : 'Favoritar'}
                     </button>
                   </div>
                 </div>
@@ -175,10 +192,15 @@ export function NftDetailView({ nft, requestedEdition, onSelectEdition }: NftDet
             <button
               type="button"
               aria-label={`Favoritar ${nft.name}`}
+              aria-pressed={isFavorite}
               className="flex size-[2.1875rem] cursor-pointer items-center justify-center rounded-full border border-border bg-surface-raised text-primary"
               onClick={handleFavorite}
             >
-              <Heart aria-hidden="true" className="size-5" />
+              <Heart
+                aria-hidden="true"
+                className="size-5"
+                fill={isFavorite ? 'currentColor' : 'none'}
+              />
             </button>
           </div>
           <NftArtwork
@@ -244,7 +266,8 @@ export function NftDetailView({ nft, requestedEdition, onSelectEdition }: NftDet
           <div className="flex gap-3">
             <button
               type="button"
-              disabled={!isAvailable}
+              disabled={!canPurchase}
+              aria-busy={isAdding}
               onClick={handleBuy}
               className="h-[3.75rem] w-[12.25rem] cursor-pointer rounded-[2.5rem] bg-linear-to-r from-primary to-primary-dark text-base leading-5 font-bold text-ink disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -253,8 +276,8 @@ export function NftDetailView({ nft, requestedEdition, onSelectEdition }: NftDet
             <button
               type="button"
               aria-label="Adicionar ao carrinho"
-              disabled={!isAvailable}
-              onClick={handleBuy}
+              disabled={!canPurchase}
+              onClick={handleAddToCart}
               className="flex size-[3.75rem] shrink-0 cursor-pointer items-center justify-center rounded-[2.5rem] border border-border bg-surface-raised text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ShoppingCart aria-hidden="true" className="size-5" />

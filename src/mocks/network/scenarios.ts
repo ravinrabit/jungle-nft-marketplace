@@ -16,6 +16,7 @@ export interface MockScenario {
   failure: FailureMode
   catalog: CatalogDataset
   sessionTtlMs?: number
+  failFavorites?: boolean
 }
 
 export const DEFAULT_SESSION_TTL_MS = 30 * 60_000
@@ -113,6 +114,16 @@ export const MOCK_SCENARIOS = [
     failure: 'none',
     catalog: 'default',
     sessionTtlMs: 45_000,
+  },
+  {
+    id: 'favorites-error',
+    label: 'Falha nos favoritos',
+    description:
+      'Adicionar ou remover favoritos responde 503, para exercitar a reversão da atualização otimista.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    failFavorites: true,
   },
 ] as const satisfies readonly MockScenario[]
 

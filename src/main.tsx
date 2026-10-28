@@ -12,6 +12,7 @@ import { createQueryClient } from '@/app/query-client'
 import { createAppRouter } from '@/app/router'
 import { StartupErrorScreen } from '@/app/startup-error-screen'
 import { expireSession } from '@/features/auth/session-expiration'
+import { registerGuestCartMerge } from '@/features/cart/merge-guest-cart-on-login'
 import { sessionToken } from '@/features/auth/session-token'
 import { bindAuthentication } from '@/shared/api/http-client'
 
@@ -26,6 +27,8 @@ function getRootElement() {
 function renderApp(root: ReturnType<typeof createRoot>) {
   const queryClient = createQueryClient()
   const router = createAppRouter(queryClient)
+
+  registerGuestCartMerge()
 
   bindAuthentication({
     getToken: () => sessionToken.read(),

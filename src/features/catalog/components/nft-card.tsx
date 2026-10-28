@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { Heart, Search, ShoppingCart } from 'lucide-react'
 import type { NftSummary } from '@/shared/api/contracts/catalog'
 import { formatEth } from '@/shared/lib/eth'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { useAddToCartAction, useFavoriteAction } from '@/features/cart/use-cart-actions'
 import { RARITY_LABELS } from '../catalog-labels'
 import { NftArtwork } from './nft-artwork'
 
@@ -19,6 +19,12 @@ interface NftCardProps {
 
 export function NftCard({ nft, priority = false }: NftCardProps) {
   const rarityLabel = RARITY_LABELS[nft.rarity]
+  const favorites = useFavoriteAction()
+  const { add, isAdding } = useAddToCartAction()
+  const isFavorite = favorites.isFavorite(nft.id)
+  const toggleFavorite = () => {
+    favorites.toggle(nft.id, nft.name)
+  }
 
   return (
     <article className="group relative flex flex-col gap-2 lg:gap-3">
@@ -43,20 +49,24 @@ export function NftCard({ nft, priority = false }: NftCardProps) {
         <button
           type="button"
           aria-label={`Favoritar ${nft.name}`}
+          aria-pressed={isFavorite}
           className={`${ROUND_ACTION} absolute top-3 right-3 z-10 lg:hidden`}
-          onClick={() => {
-            notifyUnavailableFeature('Favoritar')
-          }}
+          onClick={toggleFavorite}
         >
-          <Heart aria-hidden="true" className="size-[0.9375rem]" />
+          <Heart
+            aria-hidden="true"
+            className="size-[0.9375rem]"
+            fill={isFavorite ? 'currentColor' : 'none'}
+          />
         </button>
         <div className="absolute right-4 bottom-4 z-10 hidden gap-2 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 lg:flex">
           <button
             type="button"
             aria-label={`Adicionar ${nft.name} ao carrinho`}
-            className={ROUND_ACTION}
+            disabled={!nft.isAvailable || isAdding}
+            className={`${ROUND_ACTION} disabled:cursor-not-allowed disabled:opacity-50`}
             onClick={() => {
-              notifyUnavailableFeature('O carrinho')
+              add({ nftId: nft.id, name: nft.name, editionKind: nft.defaultEdition, quantity: 1 })
             }}
           >
             <ShoppingCart aria-hidden="true" className="size-[0.9375rem]" />
@@ -64,12 +74,15 @@ export function NftCard({ nft, priority = false }: NftCardProps) {
           <button
             type="button"
             aria-label={`Favoritar ${nft.name}`}
+            aria-pressed={isFavorite}
             className={ROUND_ACTION}
-            onClick={() => {
-              notifyUnavailableFeature('Favoritar')
-            }}
+            onClick={toggleFavorite}
           >
-            <Heart aria-hidden="true" className="size-[0.9375rem]" />
+            <Heart
+              aria-hidden="true"
+              className="size-[0.9375rem]"
+              fill={isFavorite ? 'currentColor' : 'none'}
+            />
           </button>
           <Link
             to="/nfts/$nftId"

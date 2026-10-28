@@ -1,6 +1,7 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Heart, House, ScanLine, ShoppingCart } from 'lucide-react'
+import { Heart, House, ScanLine } from 'lucide-react'
 import { MobileAccountButton } from '@/features/auth/components/mobile-account-button'
+import { CartLink } from '@/features/cart/components/cart-link'
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
@@ -8,6 +9,8 @@ import { SearchDialog } from './search-dialog'
 
 const BAR_SHAPE =
   'M0 24 Q0 0 24 0 H150 C168 0 172 6 178 16 C186 31 196 40 207 40 C218 40 228 31 236 16 C242 6 246 0 264 0 H390 Q414 0 414 24 V95 H0 Z'
+
+const HIDDEN_ON_PATH_PREFIXES = ['/nfts/', '/carrinho', '/pagamento'] as const
 
 const ICON_BUTTON =
   'flex size-11 cursor-pointer items-center justify-center text-text-secondary transition-colors hover:text-text-accent'
@@ -32,7 +35,7 @@ export function MobileTabBar() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const isHome = pathname === '/'
 
-  if (pathname.startsWith('/nfts/')) {
+  if (HIDDEN_ON_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
     return null
   }
 
@@ -85,14 +88,7 @@ export function MobileTabBar() {
           />
         </li>
         <li className="flex justify-center">
-          <TabButton
-            label="Carrinho"
-            onClick={() => {
-              notifyUnavailableFeature('O carrinho')
-            }}
-          >
-            <ShoppingCart aria-hidden="true" className="size-5" />
-          </TabButton>
+          <CartLink className={ICON_BUTTON} iconClassName="size-5" />
         </li>
         <li className="flex justify-center">
           <MobileAccountButton className={ICON_BUTTON} />

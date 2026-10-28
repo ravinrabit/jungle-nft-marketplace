@@ -17,10 +17,24 @@ function discardPrivateData(queryClient: QueryClient) {
   queryClient.removeQueries({ queryKey: [PRIVATE_QUERY_ROOT] })
 }
 
-export function startSession(queryClient: QueryClient, response: AuthResponse) {
+type SessionStartListener = (queryClient: QueryClient, session: Session) => Promise<void>
+
+const sessionStartListeners = new Set<SessionStartListener>()
+
+export function onSessionStarted(listener: SessionStartListener) {
+  sessionStartListeners.add(listener)
+  return () => {
+    sessionStartListeners.delete(listener)
+  }
+}
+
+export async function startSession(queryClient: QueryClient, response: AuthResponse) {
   discardPrivateData(queryClient)
   sessionToken.write(response.token)
   queryClient.setQueryData<Session | null>(authKeys.session, response.session)
+  await Promise.all(
+    [...sessionStartListeners].map((listener) => listener(queryClient, response.session)),
+  )
 }
 
 export function endSession(queryClient: QueryClient) {

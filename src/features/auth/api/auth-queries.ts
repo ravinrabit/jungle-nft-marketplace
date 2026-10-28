@@ -37,9 +37,7 @@ export function useLogin() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: login,
-    onSuccess: (response) => {
-      startSession(queryClient, response)
-    },
+    onSuccess: (response) => startSession(queryClient, response),
   })
 }
 
@@ -47,9 +45,7 @@ export function useRegister() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: register,
-    onSuccess: (response) => {
-      startSession(queryClient, response)
-    },
+    onSuccess: (response) => startSession(queryClient, response),
   })
 }
 

@@ -38,6 +38,7 @@ export function toNftSummary(record: NftRecord): NftSummary {
     price: record.price,
     compareAtPrice: record.compareAtPrice,
     isAvailable: record.isAvailable,
+    defaultEdition: record.defaultEdition,
     version: record.version,
   }
 }

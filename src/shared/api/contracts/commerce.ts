@@ -29,13 +29,26 @@ export const cartItemSchema = z.object({
   available: z.number().int().nonnegative(),
   maxPerOrder: quantitySchema,
   nftVersion: versionSchema,
+  priceChangedFrom: ethAmountSchema.nullable(),
+})
+
+export const cartAdjustmentSchema = z.object({
+  cartItemId: entityIdSchema,
+  name: z.string(),
+  requestedQuantity: z.number().int().nonnegative(),
+  appliedQuantity: z.number().int().nonnegative(),
 })
 
 export const cartSchema = z.object({
   items: z.array(cartItemSchema),
+  itemCount: z.number().int().nonnegative(),
+  subtotal: ethAmountSchema,
   version: versionSchema,
   updatedAt: isoDateTimeSchema,
+  adjustments: z.array(cartAdjustmentSchema),
 })
+
+export const GUEST_CART_HEADER = 'X-Guest-Cart-Id'
 
 export const addCartItemRequestSchema = z.object({
   nftId: entityIdSchema,
@@ -48,7 +61,7 @@ export const updateCartItemRequestSchema = z.object({
 })
 
 export const mergeCartRequestSchema = z.object({
-  items: z.array(addCartItemRequestSchema),
+  guestCartId: z.uuid(),
 })
 
 export const quoteRequestSchema = z.object({
@@ -157,6 +170,7 @@ export type OrderStatus = z.infer<typeof orderStatusSchema>
 export type QuoteIssueType = z.infer<typeof quoteIssueTypeSchema>
 export type Favorites = z.infer<typeof favoritesSchema>
 export type CartItem = z.infer<typeof cartItemSchema>
+export type CartAdjustment = z.infer<typeof cartAdjustmentSchema>
 export type Cart = z.infer<typeof cartSchema>
 export type AddCartItemRequest = z.infer<typeof addCartItemRequestSchema>
 export type UpdateCartItemRequest = z.infer<typeof updateCartItemRequestSchema>

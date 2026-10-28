@@ -3,7 +3,7 @@ import { createUserFixtures, createWalletFixtures } from './fixtures/user-fixtur
 import type { MockDatabaseState } from './records'
 
 const STORAGE_KEY = 'kurio:mock-db'
-const SCHEMA_VERSION = 3
+const SCHEMA_VERSION = 5
 
 async function createSeedState(): Promise<MockDatabaseState> {
   return {
@@ -12,6 +12,9 @@ async function createSeedState(): Promise<MockDatabaseState> {
     users: await createUserFixtures(),
     wallets: createWalletFixtures(),
     sessions: [],
+    carts: [],
+    favorites: [],
+    quotes: [],
   }
 }
 
