@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const API_ERROR_CODES = [
   'VALIDATION_ERROR',
   'UNAUTHENTICATED',
+  'INVALID_CREDENTIALS',
   'SESSION_EXPIRED',
   'FORBIDDEN',
   'NOT_FOUND',

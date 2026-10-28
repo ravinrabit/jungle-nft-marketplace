@@ -11,6 +11,9 @@ import { bootstrapMocks } from '@/app/bootstrap-mocks'
 import { createQueryClient } from '@/app/query-client'
 import { createAppRouter } from '@/app/router'
 import { StartupErrorScreen } from '@/app/startup-error-screen'
+import { expireSession } from '@/features/auth/session-expiration'
+import { sessionToken } from '@/features/auth/session-token'
+import { bindAuthentication } from '@/shared/api/http-client'
 
 function getRootElement() {
   const rootElement = document.getElementById('root')
@@ -23,6 +26,13 @@ function getRootElement() {
 function renderApp(root: ReturnType<typeof createRoot>) {
   const queryClient = createQueryClient()
   const router = createAppRouter(queryClient)
+
+  bindAuthentication({
+    getToken: () => sessionToken.read(),
+    onSessionRejected: () => {
+      expireSession(queryClient, router)
+    },
+  })
 
   root.render(
     <StrictMode>

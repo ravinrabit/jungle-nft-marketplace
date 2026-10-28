@@ -15,7 +15,10 @@ export interface MockScenario {
   latency: LatencyProfile
   failure: FailureMode
   catalog: CatalogDataset
+  sessionTtlMs?: number
 }
+
+export const DEFAULT_SESSION_TTL_MS = 30 * 60_000
 
 const DEFAULT_LATENCY: LatencyProfile = { kind: 'range', minMs: 120, maxMs: 420 }
 
@@ -100,6 +103,16 @@ export const MOCK_SCENARIOS = [
     latency: { kind: 'none' },
     failure: 'timeout',
     catalog: 'default',
+  },
+  {
+    id: 'short-session',
+    label: 'Sessão curta',
+    description:
+      'Sessões novas expiram em 45 segundos para exercitar a expiração durante a navegação.',
+    latency: DEFAULT_LATENCY,
+    failure: 'none',
+    catalog: 'default',
+    sessionTtlMs: 45_000,
   },
 ] as const satisfies readonly MockScenario[]
 

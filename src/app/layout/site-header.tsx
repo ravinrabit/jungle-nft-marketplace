@@ -2,6 +2,10 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { LogIn, Search, ShoppingCart } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { useSession } from '@/features/auth/api/auth-queries'
+import { UserMenu } from '@/features/auth/components/user-menu'
+import { useAuthNavigation } from '@/features/auth/use-auth-navigation'
 import { SearchDialog } from './search-dialog'
 
 type NavSection = 'home' | 'market'
@@ -114,19 +118,36 @@ export function SiteHeader({ showDivider }: { showDivider: boolean }) {
           >
             <ShoppingCart aria-hidden="true" className="size-6" />
           </button>
-          <button
-            type="button"
-            className="flex h-[2.1875rem] w-[6.25rem] cursor-pointer items-center justify-center gap-1 rounded-md bg-primary text-base leading-none font-medium text-ink hover:bg-primary-light"
-            onClick={() => {
-              notifyUnavailableFeature('O login')
-            }}
-          >
-            <LogIn aria-hidden="true" className="size-5" />
-            Entrar
-          </button>
+          <AccountAction />
         </div>
       </header>
       {showDivider && <div aria-hidden="true" className="h-px bg-primary/40" />}
     </div>
+  )
+}
+
+function AccountAction() {
+  const { user, isResolving } = useSession()
+  const { openAuth } = useAuthNavigation()
+
+  if (isResolving) {
+    return <Skeleton className="h-[2.1875rem] w-[6.25rem] rounded-md" />
+  }
+
+  if (user) {
+    return <UserMenu user={user} />
+  }
+
+  return (
+    <button
+      type="button"
+      className="flex h-[2.1875rem] w-[6.25rem] cursor-pointer items-center justify-center gap-1 rounded-md bg-primary text-base leading-none font-medium text-ink hover:bg-primary-light"
+      onClick={() => {
+        openAuth('entrar')
+      }}
+    >
+      <LogIn aria-hidden="true" className="size-5" />
+      Entrar
+    </button>
   )
 }

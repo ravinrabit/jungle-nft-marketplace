@@ -1,7 +1,27 @@
-import axios, { type AxiosRequestConfig } from 'axios'
+import axios, { isAxiosError, type AxiosRequestConfig } from 'axios'
 import type { z } from 'zod'
 import { env } from '@/shared/config/env'
 import { ApiError, toApiError } from './api-error'
+
+interface AuthBindings {
+  getToken: () => string | null
+  onSessionRejected: (error: ApiError) => void
+}
+
+let authBindings: AuthBindings = {
+  getToken: () => null,
+  onSessionRejected: () => undefined,
+}
+
+export function bindAuthentication(bindings: AuthBindings) {
+  authBindings = bindings
+}
+
+const SESSION_REJECTION_CODES = new Set(['SESSION_EXPIRED', 'UNAUTHENTICATED'])
+
+function wasAuthenticatedRequest(error: unknown) {
+  return isAxiosError(error) && Boolean(error.config?.headers.get('Authorization'))
+}
 
 type QueryValue = string | number | boolean | null | undefined
 type QueryParams = Record<string, QueryValue | readonly QueryValue[]>
@@ -28,9 +48,23 @@ export const httpClient = axios.create({
   paramsSerializer: { serialize: (params) => serializeQueryParams(params as QueryParams) },
 })
 
+httpClient.interceptors.request.use((config) => {
+  const token = authBindings.getToken()
+  if (token) {
+    config.headers.set('Authorization', `Bearer ${token}`)
+  }
+  return config
+})
+
 httpClient.interceptors.response.use(
   (response) => response,
-  (error: unknown) => Promise.reject(toApiError(error)),
+  (error: unknown) => {
+    const apiError = toApiError(error)
+    if (SESSION_REJECTION_CODES.has(apiError.code) && wasAuthenticatedRequest(error)) {
+      authBindings.onSessionRejected(apiError)
+    }
+    return Promise.reject(apiError)
+  },
 )
 
 export async function requestData<TSchema extends z.ZodType>(

@@ -15,6 +15,7 @@ interface ApiErrorOptions {
 const FALLBACK_MESSAGES: Record<ClientErrorCode, string> = {
   VALIDATION_ERROR: 'Revise os campos destacados e tente novamente.',
   UNAUTHENTICATED: 'Entre na sua conta para continuar.',
+  INVALID_CREDENTIALS: 'E-mail ou senha incorretos.',
   SESSION_EXPIRED: 'Sua sessão expirou. Entre novamente para continuar.',
   FORBIDDEN: 'Você não tem permissão para acessar este recurso.',
   NOT_FOUND: 'O recurso solicitado não foi encontrado.',

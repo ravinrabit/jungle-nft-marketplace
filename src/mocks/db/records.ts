@@ -14,9 +14,17 @@ export interface WalletRecord extends Wallet {
   userId: string
 }
 
+export interface SessionRecord {
+  token: string
+  userId: string
+  createdAt: string
+  expiresAt: string
+}
+
 export interface MockDatabaseState {
   schemaVersion: number
   nfts: NftRecord[]
   users: UserRecord[]
   wallets: WalletRecord[]
+  sessions: SessionRecord[]
 }

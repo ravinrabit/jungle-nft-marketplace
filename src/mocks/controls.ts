@@ -1,4 +1,5 @@
 import { database } from './db/database'
+import { expireAllSessions } from './domain/sessions'
 import { resetNetworkSequence } from './network/network-conditions'
 import {
   isMockScenarioId,
@@ -16,6 +17,7 @@ export interface MockControls {
   getScenario: () => MockScenarioId
   setScenario: (id: MockScenarioId) => void
   reset: () => Promise<void>
+  expireSessions: () => void
 }
 
 declare global {
@@ -62,5 +64,6 @@ export function exposeMockControls() {
       resetNetworkSequence()
     },
     reset: resetMockEnvironment,
+    expireSessions: expireAllSessions,
   }
 }

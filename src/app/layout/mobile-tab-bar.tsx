@@ -1,5 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Heart, House, ScanLine, ShoppingCart, User } from 'lucide-react'
+import { Heart, House, ScanLine, ShoppingCart } from 'lucide-react'
+import { MobileAccountButton } from '@/features/auth/components/mobile-account-button'
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
@@ -94,14 +95,7 @@ export function MobileTabBar() {
           </TabButton>
         </li>
         <li className="flex justify-center">
-          <TabButton
-            label="Conta"
-            onClick={() => {
-              notifyUnavailableFeature('A conta')
-            }}
-          >
-            <User aria-hidden="true" className="size-5" />
-          </TabButton>
+          <MobileAccountButton className={ICON_BUTTON} />
         </li>
       </ul>
     </nav>

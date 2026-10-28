@@ -82,6 +82,7 @@
   --color-price-muted: var(--kurio-secondary);
   --color-success: var(--kurio-success);
   --color-error: var(--kurio-error);
+  --color-logo-facebook: #3b5999;
 
   --radius-sm: 0.3125rem;
   --radius-md: 0.375rem;
