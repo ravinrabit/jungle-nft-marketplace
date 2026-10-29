@@ -30,6 +30,16 @@ const ensNameSchema = z
 export const walletProviderSchema = z.enum(WALLET_PROVIDERS)
 export const walletSlotSchema = z.enum(WALLET_SLOTS)
 
+const AVATAR_DATA_URL = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/
+
+const avatarUrlSchema = z
+  .string()
+  .refine(
+    (value) =>
+      AVATAR_DATA_URL.test(value) || z.url({ protocol: /^https$/ }).safeParse(value).success,
+    'Avatar em formato não suportado',
+  )
+
 export const userSchema = z.object({
   id: entityIdSchema,
   username: z.string(),
@@ -37,7 +47,7 @@ export const userSchema = z.object({
   email: z.string(),
   ensName: z.string().nullable(),
   walletNickname: z.string().nullable(),
-  avatarUrl: z.string().nullable(),
+  avatarUrl: avatarUrlSchema.nullable(),
   version: versionSchema,
 })
 
@@ -84,10 +94,7 @@ export const avatarUpdateRequestSchema = z.object({
   dataUrl: z
     .string()
     .max(MAX_AVATAR_DATA_URL_LENGTH, 'A imagem deve ter no máximo 512 KB')
-    .regex(
-      /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/,
-      'Envie uma imagem PNG, JPG ou WebP',
-    ),
+    .regex(AVATAR_DATA_URL, 'Envie uma imagem PNG, JPG ou WebP'),
 })
 
 export const passwordChangeRequestSchema = z

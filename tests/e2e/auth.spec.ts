@@ -52,6 +52,13 @@ test.describe('Login e sessão', () => {
     await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
   })
 
+  test('ignora redirecionamento para outro site após o login', async ({ app, page }) => {
+    await app.open('/?auth=entrar&redirect=%2F%09%2Fevil.example')
+    await app.submitSignIn(ACCOUNTS.collector)
+    await expect(app.toast('Login realizado com sucesso.')).toBeVisible()
+    await expect(page).toHaveURL('/')
+  })
+
   test('expira a sessão pelo relógio e retoma a rota privada após novo login', async ({
     app,
     page,
