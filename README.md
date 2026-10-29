@@ -5,7 +5,8 @@ Implementação do desafio frontend da Jungle Gaming: um marketplace de NFTs com
 Toda a API REST e o servidor Socket.IO são simulados no navegador com MSW. A aplicação roda a partir de um checkout limpo, sem backend e sem serviços externos.
 
 - **Arquitetura, contratos e decisões:** [ARCHITECTURE.md](./ARCHITECTURE.md)
-- **Auditoria Lighthouse:** [lighthouse/summary.md](./lighthouse/summary.md)
+- **Aplicação publicada:** https://kurio-nikolas.vercel.app
+- **Auditoria Lighthouse:** [lighthouse/producao/summary.md](./lighthouse/producao/summary.md)
 
 ## Stack
 
@@ -38,19 +39,20 @@ Acesse `http://localhost:5173`. Os mocks iniciam automaticamente, com um banco s
 
 ### Comandos
 
-| Comando                   | O que faz                                                     |
-| ------------------------- | ------------------------------------------------------------- |
-| `npm run dev`             | Servidor de desenvolvimento com mocks                         |
-| `npm run build`           | Verificação de tipos e build de produção em `dist/`           |
-| `npm run preview`         | Serve o build de produção em `http://localhost:4173`          |
-| `npm run typecheck`       | Verificação de tipos                                          |
-| `npm run lint`            | ESLint (inclui jsx-a11y e regras com tipos)                   |
-| `npm run format:check`    | Verifica a formatação com Prettier                            |
-| `npm run test:e2e`        | Build, preview e suíte Playwright em desktop e mobile         |
-| `npm run test:e2e:report` | Abre o relatório HTML da última execução                      |
-| `npm run test:e2e:update` | Regenera as baselines de regressão visual                     |
-| `npm run lighthouse`      | Build e auditoria Lighthouse (3 medições por página e perfil) |
-| `npm run images`          | Regera as imagens otimizadas a partir de `assets/nfts`        |
+| Comando                           | O que faz                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------ |
+| `npm run dev`                     | Servidor de desenvolvimento com mocks                                          |
+| `npm run build`                   | Verificação de tipos e build de produção em `dist/`                            |
+| `npm run preview`                 | Serve o build de produção em `http://localhost:4173`                           |
+| `npm run typecheck`               | Verificação de tipos                                                           |
+| `npm run lint`                    | ESLint (inclui jsx-a11y e regras com tipos)                                    |
+| `npm run format:check`            | Verifica a formatação com Prettier                                             |
+| `npm run test:e2e`                | Build, preview e suíte Playwright em desktop e mobile                          |
+| `npm run test:e2e:report`         | Abre o relatório HTML da última execução                                       |
+| `npm run test:e2e:update`         | Regenera as baselines de regressão visual                                      |
+| `npm run lighthouse`              | Build e auditoria Lighthouse do preview local (3 medições por página e perfil) |
+| `npm run lighthouse:url -- <url>` | Mesma auditoria contra uma URL publicada                                       |
+| `npm run images`                  | Regera as imagens otimizadas a partir de `assets/nfts`                         |
 
 ### Variáveis de ambiente
 
@@ -169,19 +171,21 @@ As baselines visuais estão versionadas em `tests/e2e/__screenshots__/` e foram 
 ## Auditoria Lighthouse
 
 ```bash
-npm run lighthouse
+npm run lighthouse:url -- https://kurio-nikolas.vercel.app
 ```
 
-O script `scripts/lighthouse-audit.mjs` gera o build, sobe o preview e roda o Lighthouse 12.6.1 três vezes por página (início e detalhe) e por perfil (mobile e desktop). Cada medição usa um navegador com perfil limpo e o cenário padrão dos mocks. As medianas, o ambiente e as condições ficam em `lighthouse/summary.md`, e os relatórios HTML e JSON de cada medição em `lighthouse/reports/`.
+O script `scripts/lighthouse-audit.mjs` roda o Lighthouse 12.6.1 três vezes por página (início e detalhe) e por perfil (mobile e desktop), cada vez num navegador com perfil limpo e com o cenário padrão dos mocks. Sem URL (`npm run lighthouse`), ele gera o build e audita o preview local. As medianas, o ambiente e as condições ficam em `lighthouse/<alvo>/summary.md`, e os relatórios HTML e JSON de cada medição em `lighthouse/<alvo>/reports/`.
 
-| Perfil  | Página  | Performance | Accessibility | Best Practices | SEO | LCP    | CLS   | TBT    |
-| ------- | ------- | ----------- | ------------- | -------------- | --- | ------ | ----- | ------ |
-| mobile  | início  | 84          | 100           | 100            | 100 | 4,25 s | 0     | 117 ms |
-| mobile  | detalhe | 84          | 100           | 100            | 100 | 4,25 s | 0     | 102 ms |
-| desktop | início  | 99          | 100           | 100            | 100 | 0,91 s | 0,005 | 0 ms   |
-| desktop | detalhe | 99          | 100           | 100            | 100 | 0,91 s | 0     | 0 ms   |
+Resultado oficial, medido no build de produção publicado na Vercel ([lighthouse/producao](./lighthouse/producao/summary.md)):
 
-A performance mobile fica abaixo da meta de 90. A causa e as otimizações aplicadas estão em [ARCHITECTURE.md](./ARCHITECTURE.md#performance-e-lighthouse).
+| Perfil  | Página  | Performance | Accessibility | Best Practices | SEO | LCP   | CLS   | TBT   |
+| ------- | ------- | ----------- | ------------- | -------------- | --- | ----- | ----- | ----- |
+| mobile  | início  | 94          | 100           | 100            | 100 | 3,1 s | 0     | 67 ms |
+| mobile  | detalhe | 95          | 100           | 100            | 100 | 3,0 s | 0     | 54 ms |
+| desktop | início  | 100         | 100           | 100            | 100 | 0,6 s | 0,005 | 0 ms  |
+| desktop | detalhe | 100         | 100           | 100            | 100 | 0,6 s | 0     | 0 ms  |
+
+Todas as metas do enunciado são atingidas. No preview local ([lighthouse/local](./lighthouse/local/summary.md)), a performance mobile fica em 84; a diferença e as otimizações aplicadas estão em [ARCHITECTURE.md](./ARCHITECTURE.md#performance-e-lighthouse).
 
 ## Deploy
 
@@ -197,5 +201,5 @@ src/
   mocks/        banco simulado, regras de negócio, handlers REST, servidor Socket.IO e cenários
 tests/e2e/      suíte Playwright e baselines visuais
 scripts/        otimização de imagens e auditoria Lighthouse
-lighthouse/     resultados da auditoria
+lighthouse/     resultados da auditoria (produção e preview local)
 ```

@@ -1,14 +1,14 @@
 # Auditoria Lighthouse
 
-Executada em 2026-10-29T00:24:53.015Z com o cenário padrão dos mocks, sobre o build de produção servido por `vite preview`.
+Executada em 2026-10-29T03:48:57.381Z com o cenário padrão dos mocks, sobre o build de produção servido localmente por `vite preview`.
 Mediana de 3 medições por página e perfil, cada uma em um navegador com perfil limpo.
 
 | Perfil | Página | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT | FCP | Speed Index |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| mobile | / | **84** (meta 90) | 100 | 100 | 100 | 4251 ms | 0.000 | 117 ms | 1751 ms | 1785 ms |
-| mobile | /nfts/emerald-ape-042 | **84** (meta 90) | 100 | 100 | 100 | 4247 ms | 0.000 | 102 ms | 1827 ms | 1827 ms |
-| desktop | / | 99 | 100 | 100 | 100 | 908 ms | 0.005 | 0 ms | 560 ms | 561 ms |
-| desktop | /nfts/emerald-ape-042 | 99 | 100 | 100 | 100 | 914 ms | 0.000 | 0 ms | 542 ms | 564 ms |
+| mobile | / | **84** (meta 90) | 100 | 100 | 100 | 4244 ms | 0.000 | 106 ms | 1829 ms | 1829 ms |
+| mobile | /nfts/emerald-ape-042 | **84** (meta 90) | 100 | 100 | 100 | 4244 ms | 0.000 | 105 ms | 1825 ms | 1825 ms |
+| desktop | / | 99 | 100 | 100 | 100 | 908 ms | 0.005 | 0 ms | 320 ms | 472 ms |
+| desktop | /nfts/emerald-ape-042 | 99 | 100 | 100 | 100 | 907 ms | 0.000 | 0 ms | 539 ms | 554 ms |
 
 ## Ambiente
 

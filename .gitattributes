@@ -1,0 +1,4 @@
+lighthouse/** linguist-generated
+tests/e2e/__screenshots__/** linguist-generated
+public/mockServiceWorker.js linguist-vendored
+src/app/route-tree.gen.ts linguist-generated

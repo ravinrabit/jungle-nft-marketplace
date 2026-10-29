@@ -162,14 +162,20 @@ Respostas fora de ordem não sobrescrevem o estado, porque cada combinação de 
 
 ## Performance e Lighthouse
 
-Mediana de 3 medições por página e perfil, com build de produção e cenário padrão dos mocks (detalhes em `lighthouse/summary.md`).
+Mediana de 3 medições por página e perfil, com o cenário padrão dos mocks, em dois alvos: o build publicado na Vercel (resultado oficial, `lighthouse/producao/`) e o mesmo build servido localmente por `vite preview` (`lighthouse/local/`).
 
-| Perfil  | Página  | Performance | Accessibility | Best Practices | SEO | LCP    | CLS   | TBT    |
-| ------- | ------- | ----------- | ------------- | -------------- | --- | ------ | ----- | ------ |
-| mobile  | início  | 84          | 100           | 100            | 100 | 4,25 s | 0     | 117 ms |
-| mobile  | detalhe | 84          | 100           | 100            | 100 | 4,25 s | 0     | 102 ms |
-| desktop | início  | 99          | 100           | 100            | 100 | 0,91 s | 0,005 | 0 ms   |
-| desktop | detalhe | 99          | 100           | 100            | 100 | 0,91 s | 0     | 0 ms   |
+| Alvo     | Perfil  | Página  | Performance | Accessibility | Best Practices | SEO | LCP    | CLS   | TBT    |
+| -------- | ------- | ------- | ----------- | ------------- | -------------- | --- | ------ | ----- | ------ |
+| produção | mobile  | início  | 94          | 100           | 100            | 100 | 3,08 s | 0     | 67 ms  |
+| produção | mobile  | detalhe | 95          | 100           | 100            | 100 | 2,97 s | 0     | 54 ms  |
+| produção | desktop | início  | 100         | 100           | 100            | 100 | 0,62 s | 0,005 | 0 ms   |
+| produção | desktop | detalhe | 100         | 100           | 100            | 100 | 0,59 s | 0     | 0 ms   |
+| local    | mobile  | início  | 84          | 100           | 100            | 100 | 4,24 s | 0     | 106 ms |
+| local    | mobile  | detalhe | 84          | 100           | 100            | 100 | 4,24 s | 0     | 105 ms |
+| local    | desktop | início  | 99          | 100           | 100            | 100 | 0,91 s | 0,005 | 0 ms   |
+| local    | desktop | detalhe | 99          | 100           | 100            | 100 | 0,91 s | 0     | 0 ms   |
+
+Em produção, todas as metas do enunciado são atingidas.
 
 **Otimizações aplicadas:**
 
@@ -180,8 +186,11 @@ Mediana de 3 medições por página e perfil, com build de produção e cenário
 - Imagens em WebP com `srcset` em quatro larguras e prioridade alta na imagem principal.
 - Fontes servidas pelo próprio site.
 - Esqueletos com a altura da tela no desktop, o que zerou o CLS do detalhe (era 0,211).
+- Zod em modo `jitless`, definido no ponto de entrada: o Zod 4 testa se `eval` está disponível, e a CSP bloqueia `eval`. Esse teste gerava um alerta de CSP (Best Practices 96) e custava tempo de CPU; sem ele, o Best Practices foi a 100 e o TBT mobile em produção caiu de ~120 ms para ~60 ms.
 
-**Por que o mobile fica em 84 (meta 90):** o LCP mobile é de 4,25 s. Antes de a imagem principal poder carregar, o navegador precisa baixar e executar cerca de 390 KB gzip de JavaScript, e **172 KB disso são o próprio MSW** (incluindo as bibliotecas de cookies que ele usa). Depois ainda vêm o registro do Service Worker e a latência simulada do cenário padrão (120–420 ms por requisição), e só então a imagem é descoberta. Com o 4G lento e a CPU 4× mais lenta da emulação mobile, isso empurra o LCP. TBT (≈110 ms) e CLS (0) estão dentro das faixas boas. Remover o MSW da rota crítica seria uma simplificação exclusiva para a pontuação, o que o enunciado proíbe. Com uma API real (`VITE_API_MOCKING=disabled`), esses 172 KB e a etapa do Service Worker saem do carregamento.
+**Diferença entre produção e preview local:** os relatórios mostram que, em produção, o navegador transfere 352 KB de JavaScript, contra 409 KB no preview local. A Vercel serve os arquivos com Brotli (o chunk do MSW cai de 172 KB para 108 KB) e HTTP/2, enquanto o `vite preview` usa gzip e HTTP/1.1. Com a rede lenta simulada da emulação mobile, isso leva o LCP de 4,2 s para 3,0 s.
+
+**Por que o preview local fica em 84 (meta 90):** o LCP mobile é de 4,25 s. Antes de a imagem principal poder carregar, o navegador precisa baixar e executar cerca de 390 KB gzip de JavaScript, e **172 KB disso são o próprio MSW** (incluindo as bibliotecas de cookies que ele usa). Depois ainda vêm o registro do Service Worker e a latência simulada do cenário padrão (120–420 ms por requisição), e só então a imagem é descoberta. Com o 4G lento e a CPU 4× mais lenta da emulação mobile, isso empurra o LCP. TBT (≈110 ms) e CLS (0) estão dentro das faixas boas. Remover o MSW da rota crítica seria uma simplificação exclusiva para a pontuação, o que o enunciado proíbe. Com uma API real (`VITE_API_MOCKING=disabled`), esses 172 KB e a etapa do Service Worker saem do carregamento.
 
 O Lighthouse é executado por `scripts/lighthouse-audit.mjs`, e não pelo `lhci`, porque o `chrome-launcher` do `lhci` não consegue iniciar o navegador neste ambiente Windows (`spawn UNKNOWN`). O script usa a API oficial do Lighthouse num Chromium do Playwright.
 
@@ -200,6 +209,7 @@ O Lighthouse é executado por `scripts/lighthouse-audit.mjs`, e não pelo `lhci`
 - Nenhum HTML é injetado (`dangerouslySetInnerHTML` não é usado); dados do usuário são sempre renderizados como texto.
 - Links externos com `rel="noopener noreferrer"`. O link do explorador de blocos só é aceito se for `https`. O avatar só aceita imagem PNG/JPG/WebP embutida ou `https`; SVG é recusado.
 - Isolamento entre usuários verificado: pedidos, conexões de carteira, cotações, carteiras, favoritos e carrinho de outra conta respondem 404 ou não aparecem, e eventos de pedido só chegam ao dono.
+- O Zod roda em modo `jitless`, então nada no app depende de `eval` e a CSP não registra nenhum alerta (Best Practices 100 em produção).
 - `npm audit --omit=dev`: nenhuma vulnerabilidade. Os alertas do `npm audit` completo estão todos na cadeia de dependências do Lighthouse 12.6.1, ferramenta de desenvolvimento que não vai para o site. A correção exige o Lighthouse 13.6.0, publicado na véspera da entrega, e não foi adotada para não invalidar as medições reportadas.
 
 ## Decisões de UX e desvios do Figma
@@ -226,4 +236,4 @@ O Lighthouse é executado por `scripts/lighthouse-audit.mjs`, e não pelo `lhci`
 - A conexão de carteira, a assinatura e o hash da transação são simulados: o link "Ver no Etherscan" abre o explorador real com um hash fictício, que não existe na rede.
 - A recuperação de senha não envia e-mail; o fluxo termina na confirmação de envio.
 - As baselines visuais foram geradas no Windows e precisam ser regeneradas em outros sistemas.
-- Performance mobile abaixo da meta, pelos motivos descritos acima.
+- Performance mobile no preview local (84) abaixo da meta; em produção, 94–95.

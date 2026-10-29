@@ -1,14 +1,14 @@
 # Auditoria Lighthouse
 
-Executada em 2026-10-29T03:07:55.248Z com o cenário padrão dos mocks, sobre o build de produção publicado em https://kurio-nikolas.vercel.app.
+Executada em 2026-10-29T03:46:28.682Z com o cenário padrão dos mocks, sobre o build de produção publicado em https://kurio-nikolas.vercel.app.
 Mediana de 3 medições por página e perfil, cada uma em um navegador com perfil limpo.
 
 | Perfil | Página | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT | FCP | Speed Index |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| mobile | / | 93 | 100 | 96 | 100 | 3135 ms | 0.000 | 110 ms | 1084 ms | 1807 ms |
-| mobile | /nfts/emerald-ape-042 | 94 | 100 | 96 | 100 | 2980 ms | 0.000 | 112 ms | 1082 ms | 1464 ms |
-| desktop | / | 100 | 100 | 96 | 100 | 640 ms | 0.005 | 0 ms | 275 ms | 532 ms |
-| desktop | /nfts/emerald-ape-042 | 100 | 100 | 96 | 100 | 596 ms | 0.000 | 0 ms | 267 ms | 459 ms |
+| mobile | / | 94 | 100 | 100 | 100 | 3080 ms | 0.000 | 67 ms | 1080 ms | 1601 ms |
+| mobile | /nfts/emerald-ape-042 | 95 | 100 | 100 | 100 | 2968 ms | 0.000 | 54 ms | 1075 ms | 1532 ms |
+| desktop | / | 100 | 100 | 100 | 100 | 624 ms | 0.005 | 0 ms | 269 ms | 498 ms |
+| desktop | /nfts/emerald-ape-042 | 100 | 100 | 100 | 100 | 586 ms | 0.000 | 0 ms | 262 ms | 380 ms |
 
 ## Ambiente
 

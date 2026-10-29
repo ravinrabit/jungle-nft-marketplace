@@ -1,7 +1,7 @@
 {
   "target": "https://kurio-nikolas.vercel.app",
   "environment": {
-    "date": "2026-10-29T03:07:55.248Z",
+    "date": "2026-10-29T03:46:28.682Z",
     "lighthouse": "12.6.1",
     "browser": "Chromium 156.0.8078.4 (Playwright, headless)",
     "node": "v24.19.0",
@@ -20,17 +20,17 @@
       "page": "/",
       "median": {
         "categories": {
-          "performance": 93,
+          "performance": 94,
           "accessibility": 100,
-          "best-practices": 96,
+          "best-practices": 100,
           "seo": 100
         },
         "metrics": {
-          "lcp": 3134.924,
-          "cls": 0.0002958347083684089,
-          "tbt": 109.5,
-          "fcp": 1083.666,
-          "si": 1806.5966394512811
+          "lcp": 3080.217,
+          "cls": 0.00020797442845424516,
+          "tbt": 66.5,
+          "fcp": 1080.217,
+          "si": 1600.746293292771
         }
       }
     },
@@ -39,17 +39,17 @@
       "page": "/nfts/emerald-ape-042",
       "median": {
         "categories": {
-          "performance": 94,
+          "performance": 95,
           "accessibility": 100,
-          "best-practices": 96,
+          "best-practices": 100,
           "seo": 100
         },
         "metrics": {
-          "lcp": 2980.404,
-          "cls": 0.00023747586034934733,
-          "tbt": 111.5,
-          "fcp": 1082.404,
-          "si": 1464.0191656610807
+          "lcp": 2967.79,
+          "cls": 0.00032533614026351106,
+          "tbt": 53.5,
+          "fcp": 1074.79,
+          "si": 1532.3386360026
         }
       }
     },
@@ -60,15 +60,15 @@
         "categories": {
           "performance": 100,
           "accessibility": 100,
-          "best-practices": 96,
+          "best-practices": 100,
           "seo": 100
         },
         "metrics": {
-          "lcp": 640.054,
-          "cls": 0.0047898284227884304,
+          "lcp": 624.087,
+          "cls": 0.0047755166287248635,
           "tbt": 0,
-          "fcp": 275.36,
-          "si": 532.488001382536
+          "fcp": 269.087,
+          "si": 498.1389851549838
         }
       }
     },
@@ -79,15 +79,15 @@
         "categories": {
           "performance": 100,
           "accessibility": 100,
-          "best-practices": 96,
+          "best-practices": 100,
           "seo": 100
         },
         "metrics": {
-          "lcp": 595.9075,
-          "cls": 0.00004818930041152264,
+          "lcp": 585.754,
+          "cls": 0.00003387750634795552,
           "tbt": 0,
-          "fcp": 267.4075,
-          "si": 458.8233962276279
+          "fcp": 261.754,
+          "si": 380.2789669148101
         }
       }
     }
