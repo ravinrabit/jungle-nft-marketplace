@@ -7,6 +7,6 @@ package-lock.json
 public/mockServiceWorker.js
 src/app/route-tree.gen.ts
 tests/**/*-snapshots
-lighthouse/reports
-lighthouse/summary.md
-lighthouse/summary.json
+lighthouse/*/reports
+lighthouse/*/summary.md
+lighthouse/*/summary.json

@@ -1,0 +1,95 @@
+{
+  "target": "https://kurio-nikolas.vercel.app",
+  "environment": {
+    "date": "2026-10-29T03:07:55.248Z",
+    "lighthouse": "12.6.1",
+    "browser": "Chromium 156.0.8078.4 (Playwright, headless)",
+    "node": "v24.19.0",
+    "os": "Windows_NT 10.0.26200 x64",
+    "cpu": "AMD Ryzen 5 5600GT with Radeon Graphics         (12 núcleos)"
+  },
+  "targets": {
+    "performance": 90,
+    "accessibility": 95,
+    "best-practices": 95,
+    "seo": 90
+  },
+  "results": [
+    {
+      "profile": "mobile",
+      "page": "/",
+      "median": {
+        "categories": {
+          "performance": 93,
+          "accessibility": 100,
+          "best-practices": 96,
+          "seo": 100
+        },
+        "metrics": {
+          "lcp": 3134.924,
+          "cls": 0.0002958347083684089,
+          "tbt": 109.5,
+          "fcp": 1083.666,
+          "si": 1806.5966394512811
+        }
+      }
+    },
+    {
+      "profile": "mobile",
+      "page": "/nfts/emerald-ape-042",
+      "median": {
+        "categories": {
+          "performance": 94,
+          "accessibility": 100,
+          "best-practices": 96,
+          "seo": 100
+        },
+        "metrics": {
+          "lcp": 2980.404,
+          "cls": 0.00023747586034934733,
+          "tbt": 111.5,
+          "fcp": 1082.404,
+          "si": 1464.0191656610807
+        }
+      }
+    },
+    {
+      "profile": "desktop",
+      "page": "/",
+      "median": {
+        "categories": {
+          "performance": 100,
+          "accessibility": 100,
+          "best-practices": 96,
+          "seo": 100
+        },
+        "metrics": {
+          "lcp": 640.054,
+          "cls": 0.0047898284227884304,
+          "tbt": 0,
+          "fcp": 275.36,
+          "si": 532.488001382536
+        }
+      }
+    },
+    {
+      "profile": "desktop",
+      "page": "/nfts/emerald-ape-042",
+      "median": {
+        "categories": {
+          "performance": 100,
+          "accessibility": 100,
+          "best-practices": 96,
+          "seo": 100
+        },
+        "metrics": {
+          "lcp": 595.9075,
+          "cls": 0.00004818930041152264,
+          "tbt": 0,
+          "fcp": 267.4075,
+          "si": 458.8233962276279
+        }
+      }
+    }
+  ]
+}

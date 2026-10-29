@@ -9,9 +9,22 @@ import lighthousePackage from 'lighthouse/package.json' with { type: 'json' }
 
 const PORT = 4173
 const DEBUGGING_PORT = 9333
-const BASE_URL = `http://localhost:${PORT}`
+const LOCAL_URL = `http://localhost:${PORT}`
 const RUNS_PER_PAGE = 3
-const OUTPUT_DIR = path.resolve('lighthouse')
+
+const remoteUrl = process.argv[2]?.replace(/\/$/, '')
+const TARGET = remoteUrl
+  ? {
+      label: 'producao',
+      baseUrl: remoteUrl,
+      description: `o build de produção publicado em ${remoteUrl}`,
+    }
+  : {
+      label: 'local',
+      baseUrl: LOCAL_URL,
+      description: 'o build de produção servido localmente por `vite preview`',
+    }
+const OUTPUT_DIR = path.resolve('lighthouse', TARGET.label)
 const CATEGORIES = ['performance', 'accessibility', 'best-practices', 'seo']
 const TARGETS = { performance: 90, accessibility: 95, 'best-practices': 95, seo: 90 }
 const METRICS = {
@@ -47,7 +60,7 @@ function startPreviewServer() {
 async function waitForServer() {
   for (let attempt = 0; attempt < 60; attempt += 1) {
     try {
-      const response = await fetch(BASE_URL)
+      const response = await fetch(LOCAL_URL)
       if (response.ok) {
         return
       }
@@ -56,7 +69,7 @@ async function waitForServer() {
     }
   }
   throw new Error(
-    `O preview não respondeu em ${BASE_URL}. Rode "npm run build" antes da auditoria.`,
+    `O preview não respondeu em ${LOCAL_URL}. Rode "npm run build" antes da auditoria.`,
   )
 }
 
@@ -106,7 +119,7 @@ function toMarkdown(summary) {
   const lines = [
     '# Auditoria Lighthouse',
     '',
-    `Executada em ${summary.environment.date} com o cenário padrão dos mocks, sobre o build de produção servido por \`vite preview\`.`,
+    `Executada em ${summary.environment.date} com o cenário padrão dos mocks, sobre ${TARGET.description}.`,
     `Mediana de ${RUNS_PER_PAGE} medições por página e perfil, cada uma em um navegador com perfil limpo.`,
     '',
     '| Perfil | Página | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT | FCP | Speed Index |',
@@ -134,16 +147,18 @@ function toMarkdown(summary) {
     '',
     '- Mobile: configuração padrão do Lighthouse (emulação Moto G Power, 4G lenta simulada, CPU 4x mais lenta).',
     '- Desktop: configuração desktop oficial do Lighthouse (1350x940, rede de 10 Mbps simulada, sem desaceleração de CPU).',
-    '- Relatórios HTML e JSON de cada medição em `lighthouse/reports/<perfil>/`.',
+    `- Relatórios HTML e JSON de cada medição em \`lighthouse/${TARGET.label}/reports/<perfil>/\`.`,
   )
   return `${lines.join('\n')}\n`
 }
 
 async function main() {
   await rm(path.join(OUTPUT_DIR, 'reports'), { recursive: true, force: true })
-  const server = startPreviewServer()
+  const server = remoteUrl ? null : startPreviewServer()
   try {
-    await waitForServer()
+    if (server) {
+      await waitForServer()
+    }
     const results = []
     let browserVersion = ''
 
@@ -159,7 +174,7 @@ async function main() {
             lhr,
             reports,
             browserVersion: version,
-          } = await auditOnce(`${BASE_URL}${page.path}`, profile)
+          } = await auditOnce(`${TARGET.baseUrl}${page.path}`, profile)
           browserVersion = version
           lhrs.push(lhr)
           const [html, json] = reports
@@ -172,6 +187,7 @@ async function main() {
     }
 
     const summary = {
+      target: TARGET.baseUrl,
       environment: {
         date: new Date().toISOString(),
         lighthouse: lighthousePackage.version,
@@ -187,7 +203,7 @@ async function main() {
     await writeFile(path.join(OUTPUT_DIR, 'summary.md'), toMarkdown(summary))
     console.log(toMarkdown(summary))
   } finally {
-    server.kill()
+    server?.kill()
   }
 }
 

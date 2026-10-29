@@ -1,14 +1,14 @@
 # Auditoria Lighthouse
 
-Executada em 2026-10-29T00:24:53.015Z com o cenário padrão dos mocks, sobre o build de produção servido por `vite preview`.
+Executada em 2026-10-29T03:07:55.248Z com o cenário padrão dos mocks, sobre o build de produção publicado em https://kurio-nikolas.vercel.app.
 Mediana de 3 medições por página e perfil, cada uma em um navegador com perfil limpo.
 
 | Perfil | Página | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT | FCP | Speed Index |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| mobile | / | **84** (meta 90) | 100 | 100 | 100 | 4251 ms | 0.000 | 117 ms | 1751 ms | 1785 ms |
-| mobile | /nfts/emerald-ape-042 | **84** (meta 90) | 100 | 100 | 100 | 4247 ms | 0.000 | 102 ms | 1827 ms | 1827 ms |
-| desktop | / | 99 | 100 | 100 | 100 | 908 ms | 0.005 | 0 ms | 560 ms | 561 ms |
-| desktop | /nfts/emerald-ape-042 | 99 | 100 | 100 | 100 | 914 ms | 0.000 | 0 ms | 542 ms | 564 ms |
+| mobile | / | 93 | 100 | 96 | 100 | 3135 ms | 0.000 | 110 ms | 1084 ms | 1807 ms |
+| mobile | /nfts/emerald-ape-042 | 94 | 100 | 96 | 100 | 2980 ms | 0.000 | 112 ms | 1082 ms | 1464 ms |
+| desktop | / | 100 | 100 | 96 | 100 | 640 ms | 0.005 | 0 ms | 275 ms | 532 ms |
+| desktop | /nfts/emerald-ape-042 | 100 | 100 | 96 | 100 | 596 ms | 0.000 | 0 ms | 267 ms | 459 ms |
 
 ## Ambiente
 
@@ -22,4 +22,4 @@ Mediana de 3 medições por página e perfil, cada uma em um navegador com perfi
 
 - Mobile: configuração padrão do Lighthouse (emulação Moto G Power, 4G lenta simulada, CPU 4x mais lenta).
 - Desktop: configuração desktop oficial do Lighthouse (1350x940, rede de 10 Mbps simulada, sem desaceleração de CPU).
-- Relatórios HTML e JSON de cada medição em `lighthouse/reports/<perfil>/`.
+- Relatórios HTML e JSON de cada medição em `lighthouse/producao/reports/<perfil>/`.
