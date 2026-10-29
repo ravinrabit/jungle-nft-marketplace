@@ -10,7 +10,6 @@ const envSchema = z.object({
 const parsed = envSchema.parse(import.meta.env)
 
 export const env = {
-  isMockingEnabled: parsed.VITE_API_MOCKING === 'enabled',
   apiBaseUrl: parsed.VITE_API_BASE_URL,
   socketUrl: parsed.VITE_SOCKET_URL ?? window.location.origin,
   apiTimeoutMs: parsed.VITE_API_TIMEOUT_MS,

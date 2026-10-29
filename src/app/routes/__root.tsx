@@ -1,13 +1,19 @@
 import { createRootRouteWithContext, Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { lazy, Suspense } from 'react'
 import type { RouterContext } from '@/app/router'
 import { MobileTabBar } from '@/app/layout/mobile-tab-bar'
 import { SiteFooter } from '@/app/layout/site-footer'
 import { SiteHeader } from '@/app/layout/site-header'
 import { Toaster } from '@/shared/ui/sonner'
 import { authSearchSchema } from '@/features/auth/auth-search'
-import { AuthDialog } from '@/features/auth/components/auth-dialog'
 import { SessionWatcher } from '@/features/auth/components/session-watcher'
 import { RealtimeStatusNotice } from '@/features/realtime/components/realtime-status-notice'
+
+const AuthDialog = lazy(() =>
+  import('@/features/auth/components/auth-dialog').then((module) => ({
+    default: module.AuthDialog,
+  })),
+)
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   validateSearch: authSearchSchema,
@@ -17,6 +23,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const { auth } = Route.useSearch()
 
   return (
     <>
@@ -38,7 +45,11 @@ function RootLayout() {
         </div>
       </div>
       <MobileTabBar />
-      <AuthDialog />
+      {auth && (
+        <Suspense fallback={null}>
+          <AuthDialog />
+        </Suspense>
+      )}
       <SessionWatcher />
       <RealtimeStatusNotice />
       <Toaster position="top-center" />

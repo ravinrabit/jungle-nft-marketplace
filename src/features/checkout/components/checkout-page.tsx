@@ -44,7 +44,7 @@ function CheckoutSkeleton() {
     <div
       aria-busy="true"
       aria-label="Carregando pagamento"
-      className="flex flex-col gap-8 lg:flex-row lg:justify-between"
+      className="flex flex-col gap-8 lg:min-h-dvh lg:flex-row lg:justify-between"
     >
       <div className="grid gap-6 md:grid-cols-2 lg:w-[47.6875rem]">
         {Array.from({ length: 10 }, (_, index) => (

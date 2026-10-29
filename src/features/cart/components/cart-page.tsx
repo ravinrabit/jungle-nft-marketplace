@@ -30,7 +30,7 @@ function CartSkeleton() {
     <div
       aria-busy="true"
       aria-label="Carregando carrinho"
-      className="flex flex-col gap-5 lg:flex-row lg:justify-between"
+      className="flex flex-col gap-5 lg:min-h-dvh lg:flex-row lg:justify-between"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-3 xl:w-[48.875rem] xl:flex-none">
         {Array.from({ length: 3 }, (_, index) => (

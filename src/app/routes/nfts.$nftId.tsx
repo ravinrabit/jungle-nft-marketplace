@@ -20,7 +20,7 @@ export const Route = createFileRoute('/nfts/$nftId')({
 
 function NftDetailSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Carregando NFT" className="flex flex-col gap-3">
+    <div aria-busy="true" aria-label="Carregando NFT" className="flex flex-col gap-3 lg:min-h-dvh">
       <Skeleton className="hidden h-4 w-36 lg:block" />
       <div className="flex flex-col gap-8 lg:flex-row">
         <div className="hidden gap-7 lg:flex">
