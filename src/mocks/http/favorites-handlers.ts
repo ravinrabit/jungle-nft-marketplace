@@ -1,5 +1,6 @@
 import { HttpResponse } from 'msw'
 import { database } from '@/mocks/db/database'
+import { toNftSummary } from '@/mocks/domain/catalog-query'
 import { authenticate } from '@/mocks/domain/sessions'
 import { getActiveScenario } from '@/mocks/network/scenarios'
 import { mockApi, readPathParam } from './mock-api'
@@ -31,6 +32,21 @@ function simulatedFailure() {
 }
 
 export const favoritesHandlers = [
+  mockApi.get('/me/favorites/items', ({ request }) => {
+    const context = authenticate(request)
+    if (context instanceof Response) {
+      return context
+    }
+    const nftIds = favoritesOf(context.user.id)
+    const items = database.read((state) =>
+      nftIds.flatMap((nftId) => {
+        const nft = state.nfts.find((candidate) => candidate.id === nftId)
+        return nft ? [toNftSummary(nft)] : []
+      }),
+    )
+    return HttpResponse.json({ items })
+  }),
+
   mockApi.get('/me/favorites', ({ request }) => {
     const context = authenticate(request)
     if (context instanceof Response) {

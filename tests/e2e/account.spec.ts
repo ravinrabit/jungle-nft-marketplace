@@ -27,6 +27,7 @@ test.describe('Perfil do colecionador', () => {
 
     await app.reload()
     await expect(page.getByLabel(/^Nome de exibição/)).toHaveValue('Colecionadora Atualizada')
+    expect(await app.horizontalOverflow()).toBe(0)
   })
 
   test('envia, rejeita e remove o avatar', async ({ app, page }) => {

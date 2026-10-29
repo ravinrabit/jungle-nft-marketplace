@@ -1,5 +1,9 @@
 import { HttpResponse } from 'msw'
-import { loginRequestSchema, registerRequestSchema } from '@/shared/api/contracts/account'
+import {
+  loginRequestSchema,
+  passwordResetRequestSchema,
+  registerRequestSchema,
+} from '@/shared/api/contracts/account'
 import type { FieldErrors } from '@/shared/api/contracts/errors'
 import { database } from '@/mocks/db/database'
 import type { UserRecord } from '@/mocks/db/records'
@@ -100,6 +104,14 @@ export const authHandlers = [
       return context
     }
     return HttpResponse.json(toSessionPayload(context.session, context.user))
+  }),
+
+  mockApi.post('/auth/password-reset', async ({ request }) => {
+    const body = passwordResetRequestSchema.safeParse(await readJson(request))
+    if (!body.success) {
+      return validationError(body.error, 'Informe um e-mail válido.')
+    }
+    return new HttpResponse(null, { status: 202 })
   }),
 
   mockApi.post('/auth/logout', ({ request }) => {

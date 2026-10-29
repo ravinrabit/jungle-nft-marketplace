@@ -1,5 +1,5 @@
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
 import { FacebookIcon } from '@/shared/ui/brand-icons'
+import { ComingSoonBadge } from '@/shared/ui/coming-soon'
 
 function GoogleMark() {
   return (
@@ -25,7 +25,7 @@ function GoogleMark() {
 }
 
 const SOCIAL_BUTTON =
-  'flex h-10 w-full cursor-pointer items-center justify-center gap-3 rounded-[0.3125rem] border border-border text-[0.8125rem] leading-4 font-medium text-text-secondary transition-colors hover:border-primary hover:text-text-accent'
+  'flex h-10 w-full cursor-not-allowed items-center justify-center gap-3 rounded-[0.3125rem] border border-border text-[0.8125rem] leading-4 font-medium text-text-secondary opacity-60'
 
 export function SocialSignIn() {
   return (
@@ -36,25 +36,15 @@ export function SocialSignIn() {
         <span aria-hidden="true" className="h-px flex-1 bg-border" />
       </div>
       <div className="flex flex-col gap-4 lg:gap-3 lg:px-20">
-        <button
-          type="button"
-          className={SOCIAL_BUTTON}
-          onClick={() => {
-            notifyUnavailableFeature('O login com Google')
-          }}
-        >
+        <button type="button" disabled className={SOCIAL_BUTTON}>
           <GoogleMark />
           Continuar com Google
+          <ComingSoonBadge />
         </button>
-        <button
-          type="button"
-          className={SOCIAL_BUTTON}
-          onClick={() => {
-            notifyUnavailableFeature('O login com Facebook')
-          }}
-        >
+        <button type="button" disabled className={SOCIAL_BUTTON}>
           <FacebookIcon className="size-5 text-logo-facebook" />
           Continuar com Facebook
+          <ComingSoonBadge />
         </button>
       </div>
     </div>

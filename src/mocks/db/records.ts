@@ -71,6 +71,11 @@ export interface OrderRecord extends Order {
   resolveAt: string
 }
 
+export interface NewsletterSubscriptionRecord {
+  email: string
+  subscribedAt: string
+}
+
 export interface MockDatabaseState {
   schemaVersion: number
   nfts: NftRecord[]
@@ -82,4 +87,5 @@ export interface MockDatabaseState {
   quotes: QuoteRecord[]
   walletConnections: WalletConnectionRecord[]
   orders: OrderRecord[]
+  newsletterSubscriptions: NewsletterSubscriptionRecord[]
 }

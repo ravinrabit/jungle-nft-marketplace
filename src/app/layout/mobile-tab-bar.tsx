@@ -2,9 +2,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { Heart, House, ScanLine } from 'lucide-react'
 import { MobileAccountButton } from '@/features/auth/components/mobile-account-button'
 import { CartLink } from '@/features/cart/components/cart-link'
-import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
 import { SearchDialog } from './search-dialog'
 
 const BAR_SHAPE =
@@ -15,25 +13,10 @@ const HIDDEN_ON_PATH_PREFIXES = ['/nfts/', '/carrinho', '/pagamento'] as const
 const ICON_BUTTON =
   'flex size-11 cursor-pointer items-center justify-center text-text-secondary transition-colors hover:text-text-accent'
 
-function TabButton({
-  label,
-  onClick,
-  children,
-}: {
-  label: string
-  onClick: () => void
-  children: ReactNode
-}) {
-  return (
-    <button type="button" aria-label={label} className={ICON_BUTTON} onClick={onClick}>
-      {children}
-    </button>
-  )
-}
-
 export function MobileTabBar() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const isHome = pathname === '/'
+  const isFavorites = pathname === '/perfil/favoritos'
 
   if (HIDDEN_ON_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
     return null
@@ -65,14 +48,18 @@ export function MobileTabBar() {
           </Link>
         </li>
         <li className="flex justify-center">
-          <TabButton
-            label="Favoritos"
-            onClick={() => {
-              notifyUnavailableFeature('A lista de favoritos')
-            }}
+          <Link
+            to="/perfil/favoritos"
+            aria-label="Lista de interesse"
+            aria-current={isFavorites ? 'page' : undefined}
+            className={cn(ICON_BUTTON, isFavorites && 'text-text-accent')}
           >
-            <Heart aria-hidden="true" className="size-5" />
-          </TabButton>
+            <Heart
+              aria-hidden="true"
+              className="size-5"
+              fill={isFavorites ? 'currentColor' : 'none'}
+            />
+          </Link>
         </li>
         <li className="flex justify-center">
           <SearchDialog

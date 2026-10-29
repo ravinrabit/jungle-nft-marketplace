@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const AUTH_MODES = ['entrar', 'cadastro'] as const
+export const AUTH_MODES = ['entrar', 'cadastro', 'recuperar'] as const
 
 export type AuthMode = (typeof AUTH_MODES)[number]
 

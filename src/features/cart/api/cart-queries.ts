@@ -21,6 +21,7 @@ import { guestCartId } from '../guest-cart-id'
 import {
   addCartItem,
   fetchCart,
+  fetchFavoriteNfts,
   fetchFavorites,
   removeCartItem,
   requestQuote,
@@ -37,6 +38,7 @@ export const cartKeys = {
   quote: (owner: CartOwnerKey, cartVersion: number, request: QuoteRequest) =>
     [...owner, 'quote', cartVersion, request] as const,
   favorites: (userId: string) => [...privateQueryKey(userId), 'favorites'] as const,
+  favoriteNfts: (userId: string) => [...privateQueryKey(userId), 'favorite-nfts'] as const,
 }
 
 const PENDING_SESSION_OWNER: CartOwnerKey = [PRIVATE_QUERY_ROOT, 'sessao-pendente']
@@ -149,6 +151,13 @@ export function favoritesQueryOptions(userId: string) {
   })
 }
 
+export function favoriteNftsQueryOptions(userId: string) {
+  return queryOptions({
+    queryKey: cartKeys.favoriteNfts(userId),
+    queryFn: ({ signal }) => fetchFavoriteNfts(signal),
+  })
+}
+
 export function useFavorites() {
   const { user } = useSession()
   const query = useQuery({
@@ -195,6 +204,11 @@ export function useToggleFavorite(onError: (message: string) => void) {
     },
     onSuccess: (favorites, _variables, context) => {
       queryClient.setQueryData(context.key, favorites)
+    },
+    onSettled: () => {
+      if (user) {
+        void queryClient.invalidateQueries({ queryKey: cartKeys.favoriteNfts(user.id) })
+      }
     },
   })
 }

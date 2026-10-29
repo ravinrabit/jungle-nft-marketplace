@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { loginRequestSchema, type LoginRequest } from '@/shared/api/contracts/account'
 import { getErrorMessage, hasErrorCode } from '@/shared/api/api-error'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
 import { useLogin } from '../api/auth-queries'
 import { applyServerFieldErrors } from '../apply-server-errors'
 import { AuthField, PasswordField } from './auth-field'
@@ -10,9 +9,10 @@ import { AuthSubmitButton, FormAlert } from './auth-form-parts'
 
 interface LoginFormProps {
   onSuccess: () => void
+  onForgotPassword: () => void
 }
 
-export function LoginForm({ onSuccess }: LoginFormProps) {
+export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
   const login = useLogin()
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginRequestSchema),
@@ -57,9 +57,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <button
             type="button"
             className="cursor-pointer text-sm leading-4 text-text-accent hover:underline"
-            onClick={() => {
-              notifyUnavailableFeature('A recuperação de senha')
-            }}
+            onClick={onForgotPassword}
           >
             Esqueceu a senha?
           </button>

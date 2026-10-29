@@ -6,20 +6,25 @@ import { useSession } from '../api/auth-queries'
 import type { AuthMode } from '../auth-search'
 import { useAuthNavigation } from '../use-auth-navigation'
 import { LoginForm } from './login-form'
+import { PasswordResetForm } from './password-reset-form'
 import { RegisterForm } from './register-form'
 import { SocialSignIn } from './social-sign-in'
 
 const DESCRIPTIONS: Record<AuthMode, string> = {
   entrar: 'Entre para gerenciar sua carteira, coleção e perfil de criador.',
   cadastro: 'Crie seu perfil de colecionador e conecte uma carteira quando quiser.',
+  recuperar: 'Informe o e-mail da sua conta para receber as instruções de redefinição de senha.',
 }
 
 const MOBILE_TITLES: Record<AuthMode, string> = {
   entrar: 'Entrar',
   cadastro: 'Criar perfil de colecionador',
+  recuperar: 'Recuperar senha',
 }
 
-const MODE_LABELS: Record<AuthMode, string> = {
+type SwitchableMode = Exclude<AuthMode, 'recuperar'>
+
+const MODE_LABELS: Record<SwitchableMode, string> = {
   entrar: 'Entrar',
   cadastro: 'Criar conta',
 }
@@ -101,8 +106,13 @@ export function AuthDialog() {
           </p>
 
           <div className="flex flex-col gap-10 lg:px-12">
-            <ModeSwitcher mode={mode} onSwitch={switchTo} />
-            <DialogTitle className="text-center text-xl leading-4 font-bold text-foreground lg:sr-only">
+            {mode !== 'recuperar' && <ModeSwitcher mode={mode} onSwitch={switchTo} />}
+            <DialogTitle
+              className={cn(
+                'text-center text-xl leading-4 font-bold text-foreground',
+                mode !== 'recuperar' && 'lg:sr-only',
+              )}
+            >
               {MOBILE_TITLES[mode]}
             </DialogTitle>
             <DialogDescription className="sr-only text-center text-[0.8125rem] leading-4 text-foreground lg:not-sr-only">
@@ -117,15 +127,31 @@ export function AuthDialog() {
             </p>
           )}
 
-          {mode === 'entrar' ? (
-            <LoginForm onSuccess={handleSuccess} />
+          {mode === 'recuperar' ? (
+            <PasswordResetForm
+              onBackToLogin={() => {
+                switchTo('entrar')
+              }}
+            />
+          ) : mode === 'entrar' ? (
+            <LoginForm
+              onSuccess={handleSuccess}
+              onForgotPassword={() => {
+                switchTo('recuperar')
+              }}
+            />
           ) : (
             <RegisterForm onSuccess={handleSuccess} />
           )}
 
-          <SocialSignIn />
+          {mode !== 'recuperar' && <SocialSignIn />}
 
-          <p className="text-center text-[0.9375rem] leading-none text-text-secondary lg:hidden">
+          <p
+            className={cn(
+              'text-center text-[0.9375rem] leading-none text-text-secondary lg:hidden',
+              mode === 'recuperar' && 'hidden',
+            )}
+          >
             {mode === 'entrar' ? 'Novo na Kurio? ' : 'Já tem uma conta? '}
             <button
               type="button"

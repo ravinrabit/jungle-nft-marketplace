@@ -1,5 +1,6 @@
 import {
   cartSchema,
+  favoriteNftsResponseSchema,
   favoritesSchema,
   GUEST_CART_HEADER,
   quoteSchema,
@@ -64,6 +65,14 @@ export function requestQuote(payload: QuoteRequest, signal?: AbortSignal) {
 
 export function fetchFavorites(signal: AbortSignal) {
   return requestData(favoritesSchema, { method: 'GET', url: '/me/favorites', signal })
+}
+
+export function fetchFavoriteNfts(signal: AbortSignal) {
+  return requestData(favoriteNftsResponseSchema, {
+    method: 'GET',
+    url: '/me/favorites/items',
+    signal,
+  })
 }
 
 export function setFavorite(nftId: string, isFavorite: boolean) {

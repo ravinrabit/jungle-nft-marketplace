@@ -1,5 +1,5 @@
 import type { ArtworkSlug } from '@/shared/api/contracts/catalog'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { ComingSoonItem } from '@/shared/ui/coming-soon'
 import { NftArtwork } from '@/features/catalog/components/nft-artwork'
 
 interface BlogPost {
@@ -48,7 +48,7 @@ const POSTS: readonly BlogPost[] = [
 
 export function BlogSection() {
   return (
-    <section aria-labelledby="blog-titulo" className="flex flex-col gap-10">
+    <section id="diario" aria-labelledby="blog-titulo" className="flex scroll-mt-8 flex-col gap-10">
       <header className="flex flex-col gap-3 text-center">
         <h2 id="blog-titulo" className="text-[1.75rem] leading-none font-bold text-text-primary">
           Diário da Cunhagem
@@ -75,16 +75,9 @@ export function BlogSection() {
                 </p>
                 <h3 className="text-base leading-none font-bold text-text-primary">{post.title}</h3>
                 <p className="text-xs leading-4 font-medium text-text-secondary">{post.excerpt}</p>
-                <button
-                  type="button"
-                  aria-label={`Ler mais sobre ${post.title}`}
-                  className="mt-auto flex cursor-pointer items-center gap-1 text-xs leading-[0.875rem] font-bold text-text-accent hover:underline"
-                  onClick={() => {
-                    notifyUnavailableFeature('O conteúdo editorial')
-                  }}
-                >
-                  Ler mais <span aria-hidden="true">→</span>
-                </button>
+                <ComingSoonItem className="mt-auto text-xs leading-[0.875rem] font-bold text-text-accent">
+                  Ler mais
+                </ComingSoonItem>
               </div>
             </article>
           </li>

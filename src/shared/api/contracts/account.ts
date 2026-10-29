@@ -56,6 +56,10 @@ export const loginRequestSchema = z.object({
   password: z.string().min(1, 'Informe sua senha'),
 })
 
+export const passwordResetRequestSchema = z.object({
+  email: emailSchema,
+})
+
 export const registerRequestSchema = z
   .object({
     username: usernameSchema,
@@ -181,6 +185,7 @@ export type Session = z.infer<typeof sessionSchema>
 export type AuthResponse = z.infer<typeof authResponseSchema>
 export type LoginRequest = z.infer<typeof loginRequestSchema>
 export type RegisterRequest = z.infer<typeof registerRequestSchema>
+export type PasswordResetRequest = z.infer<typeof passwordResetRequestSchema>
 export type ProfileUpdateRequest = z.infer<typeof profileUpdateRequestSchema>
 export type AvatarUpdateRequest = z.infer<typeof avatarUpdateRequestSchema>
 export type PasswordChangeRequest = z.infer<typeof passwordChangeRequestSchema>

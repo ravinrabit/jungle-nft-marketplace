@@ -1,8 +1,12 @@
 import { Link } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
 import { useId, useState, type ComponentType, type SVGProps } from 'react'
-import { z } from 'zod'
+import { toast } from 'sonner'
 import type { CategoryId } from '@/shared/api/contracts/catalog'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { newsletterSubscriptionRequestSchema } from '@/shared/api/contracts/newsletter'
+import { getErrorMessage } from '@/shared/api/api-error'
+import { cn } from '@/shared/lib/cn'
+import { ComingSoonBadge, ComingSoonItem } from '@/shared/ui/coming-soon'
 import {
   FacebookIcon,
   InstagramIcon,
@@ -11,6 +15,7 @@ import {
   YoutubeIcon,
 } from '@/shared/ui/brand-icons'
 import { CATEGORY_LABELS } from '@/features/catalog/catalog-labels'
+import { useNewsletterSubscription } from '@/features/newsletter/newsletter-api'
 
 const FEATURES = [
   {
@@ -31,13 +36,18 @@ const FEATURES = [
   },
 ] as const
 
-const PROFILE_LINKS = [
-  'Meu perfil',
-  'Minha coleção',
-  'Atividade',
-  'Estúdio do criador',
-  'Lista de interesse',
-] as const
+interface ProfileLink {
+  label: string
+  to?: '/perfil' | '/perfil/favoritos'
+}
+
+const PROFILE_LINKS: readonly ProfileLink[] = [
+  { label: 'Meu perfil', to: '/perfil' },
+  { label: 'Minha coleção' },
+  { label: 'Atividade' },
+  { label: 'Estúdio do criador' },
+  { label: 'Lista de interesse', to: '/perfil/favoritos' },
+]
 
 const HELP_LINKS = [
   'Central de ajuda',
@@ -72,13 +82,14 @@ const COLUMN_TITLE = 'text-lg leading-4 font-bold text-foreground'
 const COLUMN_ITEM =
   'cursor-pointer text-left text-sm leading-[1.875rem] text-foreground transition-colors hover:text-text-accent'
 
-const newsletterEmailSchema = z.email()
+const COMING_SOON_ITEM = 'text-sm leading-[1.875rem] text-foreground'
 
 function NewsletterForm() {
   const inputId = useId()
   const errorId = `${inputId}-error`
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const subscription = useNewsletterSubscription()
 
   return (
     <form
@@ -86,12 +97,25 @@ function NewsletterForm() {
       className="flex flex-col gap-4"
       onSubmit={(event) => {
         event.preventDefault()
-        if (!newsletterEmailSchema.safeParse(email.trim()).success) {
+        const parsed = newsletterSubscriptionRequestSchema.safeParse({ email })
+        if (!parsed.success) {
           setError('Informe um e-mail válido')
           return
         }
         setError(null)
-        notifyUnavailableFeature('A inscrição na newsletter')
+        subscription.mutate(parsed.data, {
+          onSuccess: ({ status }) => {
+            setEmail('')
+            toast.success(
+              status === 'subscribed'
+                ? 'Inscrição confirmada. Você vai receber os próximos lançamentos.'
+                : 'Este e-mail já está inscrito na newsletter.',
+            )
+          },
+          onError: (caught) => {
+            setError(getErrorMessage(caught))
+          },
+        })
       }}
     >
       <h2 className="text-lg leading-4 font-bold text-foreground">
@@ -116,9 +140,18 @@ function NewsletterForm() {
         />
         <button
           type="submit"
-          className="w-[5.3125rem] cursor-pointer rounded-tr-md rounded-br-md bg-primary text-lg leading-4 font-bold text-ink hover:bg-primary-light"
+          disabled={subscription.isPending}
+          aria-busy={subscription.isPending}
+          className="flex w-[5.3125rem] cursor-pointer items-center justify-center rounded-tr-md rounded-br-md bg-primary text-lg leading-4 font-bold text-ink hover:bg-primary-light disabled:cursor-wait disabled:opacity-80"
         >
-          Enviar
+          {subscription.isPending ? (
+            <>
+              <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+              <span className="sr-only">Enviando</span>
+            </>
+          ) : (
+            'Enviar'
+          )}
         </button>
       </div>
       {error && (
@@ -169,7 +202,9 @@ export function SiteFooter() {
       <div className="flex h-[5.5rem] items-center justify-center bg-surface-dark px-8">
         <div className="grid w-full max-w-[71rem] grid-cols-[1fr_1fr_1fr_14.25rem] items-center gap-6 text-sm leading-[1.375rem] text-foreground xl:gap-[5.75rem]">
           <span className="font-bold tracking-[0.1em]">KURIO</span>
-          <span className="max-w-[13.6875rem]">Feito para colecionadores, criadores e cultura</span>
+          <span className="max-w-[13.6875rem] xl:w-[13.6875rem] xl:max-w-none">
+            Feito para colecionadores, criadores e cultura
+          </span>
           <a href="mailto:contato@email.com" className="hover:text-text-accent">
             contato@email.com
           </a>
@@ -186,17 +221,17 @@ export function SiteFooter() {
               Meu perfil
             </h2>
             <ul>
-              {PROFILE_LINKS.map((label) => (
+              {PROFILE_LINKS.map(({ label, to }) => (
                 <li key={label}>
-                  <button
-                    type="button"
-                    className={COLUMN_ITEM}
-                    onClick={() => {
-                      notifyUnavailableFeature(label)
-                    }}
-                  >
-                    {label}
-                  </button>
+                  {to ? (
+                    <Link to={to} className={COLUMN_ITEM}>
+                      {label}
+                    </Link>
+                  ) : (
+                    <ComingSoonItem className={COMING_SOON_ITEM} showBadge={false}>
+                      {label}
+                    </ComingSoonItem>
+                  )}
                 </li>
               ))}
             </ul>
@@ -208,15 +243,9 @@ export function SiteFooter() {
             <ul>
               {HELP_LINKS.map((label) => (
                 <li key={label}>
-                  <button
-                    type="button"
-                    className={COLUMN_ITEM}
-                    onClick={() => {
-                      notifyUnavailableFeature(label)
-                    }}
-                  >
+                  <ComingSoonItem className={COMING_SOON_ITEM} showBadge={false}>
                     {label}
-                  </button>
+                  </ComingSoonItem>
                 </li>
               ))}
             </ul>
@@ -242,20 +271,18 @@ export function SiteFooter() {
           </nav>
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-5">
-              <h2 className={COLUMN_TITLE}>Redes sociais</h2>
+              <h2 className={cn(COLUMN_TITLE, 'flex items-center gap-2')}>
+                Redes sociais
+                <ComingSoonBadge />
+              </h2>
               <ul className="flex gap-2.5">
                 {SOCIAL_LINKS.map(({ label, Icon }) => (
-                  <li key={label}>
-                    <button
-                      type="button"
-                      aria-label={label}
-                      className="flex size-[1.875rem] cursor-pointer items-center justify-center rounded border border-primary text-primary transition-colors hover:bg-primary hover:text-ink"
-                      onClick={() => {
-                        notifyUnavailableFeature(`O perfil da Kurio no ${label}`)
-                      }}
-                    >
-                      <Icon className="size-4" />
-                    </button>
+                  <li
+                    key={label}
+                    className="flex size-[1.875rem] cursor-not-allowed items-center justify-center rounded border border-primary text-primary opacity-60"
+                  >
+                    <Icon className="size-4" />
+                    <span className="sr-only">{label}</span>
                   </li>
                 ))}
               </ul>

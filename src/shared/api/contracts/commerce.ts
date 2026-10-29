@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { walletProviderSchema } from './account'
-import { artworkSlugSchema, editionKindSchema, networkIdSchema } from './catalog'
+import { artworkSlugSchema, editionKindSchema, networkIdSchema, nftSummarySchema } from './catalog'
 import { entityIdSchema, ethAmountSchema, isoDateTimeSchema, versionSchema } from './common'
 
 export const ORDER_STATUSES = ['pending', 'confirmed', 'declined'] as const
@@ -13,6 +13,10 @@ const quantitySchema = z.number().int().positive()
 
 export const favoritesSchema = z.object({
   nftIds: z.array(entityIdSchema),
+})
+
+export const favoriteNftsResponseSchema = z.object({
+  items: z.array(nftSummarySchema),
 })
 
 export const cartItemSchema = z.object({
@@ -192,6 +196,7 @@ export const IDEMPOTENCY_KEY_HEADER = 'Idempotency-Key'
 export type OrderStatus = z.infer<typeof orderStatusSchema>
 export type QuoteIssueType = z.infer<typeof quoteIssueTypeSchema>
 export type Favorites = z.infer<typeof favoritesSchema>
+export type FavoriteNftsResponse = z.infer<typeof favoriteNftsResponseSchema>
 export type CartItem = z.infer<typeof cartItemSchema>
 export type CartAdjustment = z.infer<typeof cartAdjustmentSchema>
 export type Cart = z.infer<typeof cartSchema>

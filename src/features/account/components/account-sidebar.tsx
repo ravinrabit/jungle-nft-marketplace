@@ -11,10 +11,10 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { ComingSoonBadge } from '@/shared/ui/coming-soon'
 import { useSignOut } from '@/features/auth/use-sign-out'
 
-type AccountRoute = '/perfil' | '/perfil/carteiras'
+type AccountRoute = '/perfil' | '/perfil/carteiras' | '/perfil/favoritos'
 
 interface NavigationItem {
   label: string
@@ -26,7 +26,7 @@ const ITEMS: readonly NavigationItem[] = [
   { label: 'Dados do perfil', Icon: User, to: '/perfil' },
   { label: 'Carteiras', Icon: MapPin, to: '/perfil/carteiras' },
   { label: 'Atividade', Icon: ShoppingBag },
-  { label: 'Lista de interesse', Icon: Heart },
+  { label: 'Lista de interesse', Icon: Heart, to: '/perfil/favoritos' },
   { label: 'Ofertas', Icon: Activity },
   { label: 'Arquivos baixados', Icon: Download },
   { label: 'Suporte', Icon: TriangleAlert },
@@ -47,7 +47,7 @@ export function AccountSidebar() {
       <h2 className="flex h-9 items-center px-2.5 text-lg leading-4 font-bold text-foreground">
         Meu perfil
       </h2>
-      <ul className="flex overflow-x-auto lg:flex-col lg:overflow-visible">
+      <ul className="relative flex overflow-x-auto lg:flex-col lg:overflow-visible">
         {ITEMS.map(({ label, Icon, to }) => {
           const isActive = to === pathname.replace(/\/$/, '')
           const content = (
@@ -72,15 +72,13 @@ export function AccountSidebar() {
                   {content}
                 </Link>
               ) : (
-                <button
-                  type="button"
-                  className={ITEM_CLASSES}
-                  onClick={() => {
-                    notifyUnavailableFeature(label)
-                  }}
+                <span
+                  aria-disabled="true"
+                  className={cn(ITEM_CLASSES, 'cursor-not-allowed opacity-60 hover:bg-transparent')}
                 >
                   {content}
-                </button>
+                  <ComingSoonBadge />
+                </span>
               )}
             </li>
           )

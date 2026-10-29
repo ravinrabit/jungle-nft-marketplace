@@ -2,7 +2,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { LogIn, Search } from 'lucide-react'
 import { CartLink } from '@/features/cart/components/cart-link'
 import { cn } from '@/shared/lib/cn'
-import { notifyUnavailableFeature } from '@/shared/lib/unavailable-feature'
+import { ComingSoonItem } from '@/shared/ui/coming-soon'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { useSession } from '@/features/auth/api/auth-queries'
 import { UserMenu } from '@/features/auth/components/user-menu'
@@ -78,26 +78,14 @@ export function SiteHeader({ showDivider }: { showDivider: boolean }) {
               <NavIndicator isActive={activeSection === 'market'} />
             </li>
             <li className="flex flex-col gap-6">
-              <button
-                type="button"
-                className={cn(navLabelClasses(false), 'cursor-pointer')}
-                onClick={() => {
-                  notifyUnavailableFeature('A página de criadores')
-                }}
-              >
+              <ComingSoonItem className={cn(NAV_TEXT, 'font-normal text-foreground')}>
                 Criadores
-              </button>
+              </ComingSoonItem>
             </li>
             <li className="flex flex-col gap-6">
-              <button
-                type="button"
-                className={cn(navLabelClasses(false), 'cursor-pointer')}
-                onClick={() => {
-                  notifyUnavailableFeature('A área de conteúdos')
-                }}
-              >
+              <Link to="/" hash="diario" className={navLabelClasses(false)}>
                 Aprenda
-              </button>
+              </Link>
             </li>
           </ul>
         </nav>

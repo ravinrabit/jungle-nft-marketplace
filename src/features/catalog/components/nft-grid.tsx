@@ -11,12 +11,13 @@ const PRIORITY_IMAGE_COUNT = 2
 interface NftGridProps {
   items: readonly NftSummary[]
   isRefreshing: boolean
+  label?: string
 }
 
-export function NftGrid({ items, isRefreshing }: NftGridProps) {
+export function NftGrid({ items, isRefreshing, label = 'Resultados do catálogo' }: NftGridProps) {
   return (
     <ul
-      aria-label="Resultados do catálogo"
+      aria-label={label}
       className={cn(GRID_CLASSES, 'transition-opacity', isRefreshing && 'opacity-60')}
       aria-busy={isRefreshing}
     >
